@@ -1,0 +1,61 @@
+#lyrics { 
+    line-height:25px;
+    width:560px;
+    height:200px;
+    overflow-y:scroll;
+    text-align:left;
+    font-size:13px;
+
+    padding-top:50px;
+    padding-left:50px;
+    padding-bottom:50px;
+}
+
+.current_line
+{
+    color:red;
+    font-weight:bold;
+}
+
+/* General styles */
+*   {margin:10; padding:0; }
+
+img {border:0px; }
+
+body {
+    height:100%;
+    font:12px Arial;
+    }
+
+html {height:100%; }
+
+html>body div, html>body div * {position:static} /* good browsers */
+
+td {padding:0px 4px 0px 4px; }
+th {padding:0px 4px 0px 4px; text-align:left; }
+
+h1 {font:bold 13px Verdana; margin-top:0px; margin-bottom:14px; }
+table {border-collapse:collapse; }
+hr {margin-top:10px; margin-bottom:6px; }
+
+/***** form controls *****/
+
+input.btn   {background:#FFCC80; color:black; border:1px solid #AAAAAA; font:bold 11px Verdana; height:20px; width:90px; margin-left:2px; }
+input.ovr   {background:#D6D3CE; color:black; border:1px solid #888888; font:bold 11px Verdana; height:20px; width:90px; margin-left:2px; }
+
+.in {font:12px Verdana; border:1px solid #AAAAAA; height:18px; width:140px; margin:2px; }
+.mid    {width:250px; }
+.long   {width:450px; }
+
+textarea.in {height:100px; width:300px; }
+
+/* warnings */
+div.message-error   {width:100%; padding:2px 0px 2px 0px; font-weight:bold; background:#FF8080; }
+div.message-warning {width:100%; padding:2px 0px 2px 0px; font-weight:bold; background:#FFFF80; }
+
+.warning    {color:red; }
+ 
+.valign {margin-bottom:-2px; }
+
+/* text/plain email style */
+pre {font:11px Courier; }
