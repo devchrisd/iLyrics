@@ -21,10 +21,32 @@ function getLyrics ()
     var pos = ele_song[0].currentSrc.lastIndexOf("/");
     var url = "get_lyrics.php?id=" + ele_song[0].currentSrc.substring(pos+1);
 
+    $.getJSON(url, function (json)
+    {
+        log('result :', json);
+        data = json;
+
+        if (data !== '')
+        {
+            // show lyrics
+            lrc.start(ele_song, ele_lyrics, data);
+        }
+        else
+        {
+            // try again
+            
+            setLyrics('No lyrics available.');
+        }
+    });
+    return;
+/*
     $.ajax(url)
     .done( function(data)
     {
         // log( "Sample of data: ", data.slice( 0, 100 ) );
+        data = $.parseJSON(data);
+        log( "Sample of data: ", data );
+
         // show lyrics
         lrc.start(ele_song, ele_lyrics, data);
 
@@ -41,7 +63,7 @@ function getLyrics ()
         setLyrics('No lyrics available.');
 
     });
-
+*/
     // var ly = "[ti:Santa Claus Is Coming To Town][ar:Hilary Duff][al:Santa Claus Lane][offset:500][00:00.00]Hilary Duff - Santa Claus Is Coming To Town[00:02.15]Album: Santa Claus Lane[00:03.49][02:44.13](Santa Claus is coming)[00:11.71][02:47.35](Santa Claus is coming to town)[00:22.95][02:25.34]Oh! You better watch out,[00:24.59][02:27.21]You better not cry,[00:26.27][02:28.95]You better not pout,[00:27.78][02:30.40]I'm telling you why,[00:30.34][03:07.46]Santa Claus is coming to town,[00:43.71]He's making a list checkin it twice,[00:47.34]He's gonna find out whos naughty or nice,[01:04.22]He sees you when you're sleeping,[01:07.61]He knows when you're awake,[01:11.13]He knows when you've been bad or good,[01:14.30]So be good for goodness sake![01:17.81]Oh! You better watch out,[01:19.66]You better not cry,[01:21.31]You better not pout,[02:11.85]The kids in Girl and Boy Land[02:15.15]will have a jubilee.[02:18.69]They're gonna build a toyland town[02:22.21]all around the Christmas tree.[02:50.64][02:57.53](Santa Claus come, Santa Claus come, Santa Claus come, come, coming to town)[03:10.45][03:13.90]Santa Claus is coming (He's coming to town)[03:17.38]Santa Claus is coming,[03:21.78]He's coming to town.[03:26.37]<END>"
     // return ly;
 }
@@ -54,7 +76,8 @@ function setLyrics(lyrics)
 
 function log()
 {
-    var debug = false;
+    // var debug = false;
+    var debug = true;
     if ( debug && console && console.log )
     {
         for(var i=0; i<arguments.length; i++)

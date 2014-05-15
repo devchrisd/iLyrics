@@ -9,5 +9,6 @@
         //$fp = fopen($ly, 'r');
         $ly = file_get_contents($filename);
     }
-    echo $ly;
+    // echo $ly;
+    echo json_encode($ly);
     return;
