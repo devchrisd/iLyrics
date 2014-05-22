@@ -21,6 +21,8 @@ function getLyrics ()
     var pos = ele_song[0].currentSrc.lastIndexOf("/");
     var url = "get_lyrics.php?id=" + ele_song[0].currentSrc.substring(pos+1);
 
+    log('url', url);
+
     $.getJSON(url, function (json)
     {
         log('result :', json);
@@ -33,7 +35,7 @@ function getLyrics ()
         }
         else
         {
-            // try again
+            // try again with tag info
             
             setLyrics('No lyrics available.');
         }
@@ -76,8 +78,8 @@ function setLyrics(lyrics)
 
 function log()
 {
-    // var debug = false;
-    var debug = true;
+    var debug = false;
+    // var debug = true;
     if ( debug && console && console.log )
     {
         for(var i=0; i<arguments.length; i++)
