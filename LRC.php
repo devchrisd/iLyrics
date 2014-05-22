@@ -17,13 +17,39 @@
     <script language = "javascript" src="script/lrc.js"></script>
     
     <link rel="stylesheet" type="text/css" href="css/common.css">
+    <link rel="stylesheet" type="text/css" href="css/lyrics.css">
 </head>
 
 <body>
-    <div id='div_song'>
-        <audio id='song' src="audio/<?=$song?>" controls></audio>
-    </div>
-    <div id='lyrics'>Fetching lyrics ...</div> 
+<div class='container'>
+    <section class='container-left'>
+        <header>
+            <h1>iLyrics</h1>
+        </header>
 
+        <div id='div_song'>
+            <audio id='song' src="audio/<?=$song?>" controls></audio>
+            <figure><img id='artist_avatar' alt='artist' src='images/dou.jpg' /></figure>
+        </div>
+        <div id='lyrics'>Fetching lyrics ...</div> 
+    </section>
+
+    <section class='container-right'>
+        <div id='filelist'>
+            <ul>
+                <li>files</li>
+            </ul>
+        </div>
+        <div id='playlist'>
+            <ul>
+                <li>playing</li>
+            </ul>
+        </div> 
+    </section>
+
+    <footer>
+        2014 <a href='mailto:devchrisd@gmail.com'>Chris Ding</a>
+    </footer>
+</div>
 </body>
 </html>

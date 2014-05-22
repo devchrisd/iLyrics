@@ -70,7 +70,7 @@ class ilyrics
     const SEARCH_URL    = 'http://geci.me/api/';
 
     const LYRICS_PATH   = 'lyric/';
-    const COVER_PATH    = 'cover/';
+    const COVER_PATH    = 'images/cover/';
     const AUDIO_PATH    = 'audio/';
 
     public $id3;

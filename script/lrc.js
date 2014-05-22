@@ -1,5 +1,5 @@
-var ele_song;
-var ele_lyrics;
+var ele_song;   // element contains the song
+var ele_lyrics; // element contains the lyrics
 
 $(function()
 {
@@ -19,10 +19,12 @@ $(function()
 function getLyrics ()
 {
     var pos = ele_song[0].currentSrc.lastIndexOf("/");
+    // attach song_file name to the query
     var url = "get_lyrics.php?id=" + ele_song[0].currentSrc.substring(pos+1);
 
     log('url', url);
 
+    // get lyrics in json
     $.getJSON(url, function (json)
     {
         log('result :', json);
@@ -35,8 +37,6 @@ function getLyrics ()
         }
         else
         {
-            // try again with tag info
-            
             setLyrics('No lyrics available.');
         }
     });
@@ -89,6 +89,7 @@ function log()
     }
 }
 
+// object to show KaraOK style lyrics
 var lrc = {
 
     init: true, // first time show this lyrics
@@ -101,10 +102,13 @@ var lrc = {
     scrollInterval: 10,
 
     index: 0,   // for lytext and lytime
-    currentLine: 0,
+    currentLine: 0,     // lyrics line number of the current position
     lytext: new Array(),// lyrics text
     lytime: new Array(),// lyrics time
 
+    // ele_song:   element, 
+    // ele_lyrics: element
+    // lrc_lyrics: lyrics content
     start: function(ele_song, ele_lyrics, lrc_lyrics)
     {
         if (ele_song[0].currentSrc.length > 0)
@@ -122,9 +126,11 @@ var lrc = {
             this.scrollh = 0;
 
             this.processData(lrc_lyrics);
+            // sort by show time
             this.sortAr();
 
             // add one more empty line at tail of array for easy processing in show()
+            // this.index is the max value from this.processData
             this.lytext[this.index] = '';
             this.lytime[this.index] = this.lytime[this.index-1] + 5;
 
@@ -138,7 +144,7 @@ var lrc = {
     // scroll lyrics to current position
     scrollBar: function ()
     {
-        if ( this.isPlaying() == false )
+        if ( this.isPlaying() === false )
         {
             window.setTimeout("lrc.scrollBar()",this.scrollInterval);
             return;
@@ -159,6 +165,7 @@ var lrc = {
         window.setTimeout("lrc.scrollBar()",this.scrollInterval);
     },
 
+    // get offset(time shift) from lyrics
     getOffset: function(data)
     {
         var offset = 0;
@@ -187,6 +194,7 @@ var lrc = {
         var l_time,l_ww,i,ii;
         var sec, pos;
 
+        // if offset is set in lyrics, get it.
         this.offset = this.getOffset(data);
 
         // parse lyrics into array by time line
@@ -217,7 +225,8 @@ var lrc = {
             pos = arr_lyrics[i].lastIndexOf("]") + 1;
             l_ww = arr_lyrics[i].substring(pos);
 
-            // fill timeArray ->this.lytime and lyricsArray -> this.lytext
+            // fill time sequence to array this.lytime,
+            // and fill lyrics to Array this.lytext
             // on each time setting of this line
             for(ii=0; ii<l_time.length ; ii++)
             {
@@ -259,7 +268,7 @@ var lrc = {
 
     // convert hh:mm:ss.ms into seconds
     convert2Seconds: function (t)
-    { 
+    {
         var h, m, s;
         var totalt = 0;
 
@@ -287,7 +296,7 @@ var lrc = {
         return totalt;
     },
 
-    // get current play seconds
+    // get current play position in seconds
     getcurrentTime: function ()
     {
         return this.elementSong[0].currentTime;
@@ -295,7 +304,7 @@ var lrc = {
 
     isPlaying: function ()
     {
-        if (this.init == false &&
+        if (this.init === false &&
                 (
                 this.elementSong[0].ended ||
                 this.elementSong[0].paused
@@ -307,7 +316,7 @@ var lrc = {
     // show lyrics
     lyricsPlay: function ()
     {
-        if ( this.isPlaying() == false )
+        if ( this.isPlaying() === false )
         {
             window.setTimeout("lrc.lyricsPlay()",100);
             return;
@@ -328,7 +337,7 @@ var lrc = {
         this.elementLyrics.html(" "); // repaint
 
         // We appended an empty line at the end of lyrics
-        // for the k+1 in 'this.lytime[k] <= currentTime && currentTime < this.lytime[k+1]'
+        // for the sake of [k+1] in 'this.lytime[k] <= currentTime && currentTime < this.lytime[k+1]'.
         // so the real text ends at this.lytext[this.lytext.length-2]
         for(var k=0; k<=this.lytext.length-2; k++)
         {

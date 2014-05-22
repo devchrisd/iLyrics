@@ -1,0 +1,39 @@
+body
+{
+    width: 800px;
+}
+
+.container
+{
+    width: 100%;
+}
+
+.container-left
+{
+    background: #ccc;
+    width: 65%;
+}
+
+.container-right
+{
+    background: #666;
+    width: 35%;
+}
+
+#lyrics { 
+    line-height:25px;
+    height:200px;
+    overflow-y:scroll;
+    text-align:left;
+    font-size:13px;
+
+    padding-top:50px;
+    padding-left:20px;
+    padding-bottom:50px;
+}
+
+.current_line
+{
+    color:red;
+    font-weight:bold;
+}
