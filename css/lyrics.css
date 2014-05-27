@@ -5,6 +5,8 @@ body
 
 .container
 {
+    clear: both;
+    margin: 0 auto;
     width: 100%;
 }
 
@@ -12,6 +14,7 @@ body
 {
     background: #ccc;
     width: 65%;
+    border-radius: 5px;
 }
 
 .container-right
@@ -20,7 +23,7 @@ body
     width: 35%;
 }
 
-#lyrics { 
+#lyrics {
     line-height:25px;
     height:200px;
     overflow-y:scroll;

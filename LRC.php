@@ -28,7 +28,7 @@
         </header>
 
         <div id='div_song'>
-            <audio id='song' src="audio/<?=$song?>" controls></audio>
+            <audio id='song' src="" controls></audio>
             <figure><img id='artist_avatar' alt='artist' src='images/dou.jpg' /></figure>
         </div>
         <div id='lyrics'>Fetching lyrics ...</div> 
@@ -36,13 +36,14 @@
 
     <section class='container-right'>
         <div id='filelist'>
-            <ul>
-                <li>files</li>
+            <ul id='files'>
+
             </ul>
         </div>
         <div id='playlist'>
             <ul>
-                <li>playing</li>
+                <li>play 1</li>
+                <li>play 2</li>
             </ul>
         </div> 
     </section>

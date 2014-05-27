@@ -8,19 +8,49 @@ $(function()
         ele_song = $('#song');
         ele_lyrics = $('#lyrics');
 
-       if (ele_song[0].currentSrc.length > 0)
-        {
-            getLyrics();
-        }
+        getMp3();
+
     });
 });
 
 // Get lyrics from server
+function getMp3 ()
+{
+    var url = "get_mp3.php";
+
+    // get mp3 file list in json
+    $.getJSON(url, function (mp3)
+    {
+        log('result :', mp3);
+
+        if (mp3 !== '')
+        {
+            $.each(mp3, function(i, val){
+                $('#filelist ul').append("<li id='" + i + "'>" + val + "</li>");
+            });
+
+            ele_song.empty()
+                    .attr('src', 'audio/' + mp3[0])
+                    .appendTo(ele_song);
+            //ele_song[0].load();
+            log('song: ' +ele_song.attr('src'));
+
+           // if (ele_song[0].currentSrc.length > 0)
+            {
+                getLyrics();
+            }
+        }
+    });
+
+    return;
+}
+
+// Get lyrics from server
 function getLyrics ()
 {
-    var pos = ele_song[0].currentSrc.lastIndexOf("/");
+    var pos = ele_song.attr('src').lastIndexOf("/");
     // attach song_file name to the query
-    var url = "get_lyrics.php?id=" + ele_song[0].currentSrc.substring(pos+1);
+    var url = "get_lyrics.php?id=" + ele_song.attr('src').substring(pos+1);
 
     log('url', url);
 
@@ -28,12 +58,11 @@ function getLyrics ()
     $.getJSON(url, function (json)
     {
         log('result :', json);
-        data = json;
 
-        if (data !== '')
+        if (json !== '')
         {
             // show lyrics
-            lrc.start(ele_song, ele_lyrics, data);
+            lrc.start(ele_song, ele_lyrics, json);
         }
         else
         {
@@ -78,8 +107,8 @@ function setLyrics(lyrics)
 
 function log()
 {
-    var debug = false;
-    // var debug = true;
+    //    var debug = false;
+ var debug = true;
     if ( debug && console && console.log )
     {
         for(var i=0; i<arguments.length; i++)

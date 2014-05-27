@@ -1,3 +1,11 @@
+Testing Environment:
+ MAMP
+ - Mac OSX 10.9.3
+ - Apache 2.2.26
+ - MySQL 5.6.16
+ - PHP 5.4.24, with PEAR/PECL installed
+
+
 
 1. Build up database with sql script in config/database_setup.sql
 
@@ -5,7 +13,7 @@
 
 3. Lyrics will be saved in "lyric/"
     - Apache or the webserver user/group must have permission to create/modify file in this folder
-    - Lyrics file names are in the format of ARTIST_SONG.lrc (without space)
+    - Lyrics file name has the format of ARTIST_SONG.lrc (with no space)
         If this file is not availble, it will try the name SONG.lrc. 
         If this name SONG.lrc is available, and artist name is known, it will rename SONG.lrc to ARTIST_SONG.lrc.
 
