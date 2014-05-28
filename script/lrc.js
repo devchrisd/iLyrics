@@ -13,6 +13,13 @@ $(function()
     });
 });
 
+$('#filelist>ul>li').click(function(){
+    log('clicked');
+    ele_song.empty()
+            .attr('src', 'audio/' + $(this).text())
+            .appendTo(ele_song);
+});
+
 // Get lyrics from server
 function getMp3 ()
 {
@@ -23,22 +30,19 @@ function getMp3 ()
     {
         log('result :', mp3);
 
-        if (mp3 !== '')
+        if (mp3)
         {
             $.each(mp3, function(i, val){
-                $('#filelist ul').append("<li id='" + i + "'>" + val + "</li>");
+                $('#filelist>ul').append("<li id='" + i + "'>" + val + "</li>");
             });
 
             ele_song.empty()
                     .attr('src', 'audio/' + mp3[0])
                     .appendTo(ele_song);
             //ele_song[0].load();
-            log('song: ' +ele_song.attr('src'));
+            log('song: ' + ele_song.attr('src'));
 
-           // if (ele_song[0].currentSrc.length > 0)
-            {
-                getLyrics();
-            }
+            getLyrics();
         }
     });
 
@@ -59,7 +63,7 @@ function getLyrics ()
     {
         log('result :', json);
 
-        if (json !== '')
+        if (json)
         {
             // show lyrics
             lrc.start(ele_song, ele_lyrics, json);

@@ -3,7 +3,9 @@
 
     function debug($msg)
     {
-        error_log($msg);
+        $debug = TRUE;
+
+        if ($debug) error_log($msg);
     }
     /*
     
@@ -104,6 +106,7 @@ $id3["comment"];
                 self::LYRICS_PATH . $artist . '_' . $song . '.lrc',
                 self::LYRICS_PATH . $song . '.lrc',
                 );
+            debug('ID3: ' . print_r($this->id3,1));
         }
         else
         {

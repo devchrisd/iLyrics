@@ -19,7 +19,7 @@ body
 
 .container-right
 {
-    background: #666;
+    background: #ccc;
     width: 35%;
 }
 
@@ -37,6 +37,6 @@ body
 
 .current_line
 {
-    color:red;
+    color:blue;
     font-weight:bold;
 }
