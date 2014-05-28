@@ -1,12 +1,7 @@
 <?php
-    date_default_timezone_set('America/Toronto');
+require_once('common.php');
+require_once('curl.class.php');
 
-    function debug($msg)
-    {
-        $debug = TRUE;
-
-        if ($debug) error_log($msg);
-    }
     /*
     
         http://geci.me/api/lyric/SongName
@@ -154,6 +149,8 @@ $id3["comment"];
 
     function fetch()
     {
+        // $this->fetch_lyrics_online(); return $this->lyrics;
+
         $result = $this->get_lyrics_local();
         if ($result !== FALSE)
         {
@@ -171,17 +168,43 @@ $id3["comment"];
 
     function fetch_lyrics_from_DB()
     {
+        $this->__fetch_lyric($this->lyrics_files[0]);
+    }
+
+    function __fetch_lyric($lyrics_file)
+    {
         //$fp = fopen($ly, 'r');
-        $this->lyrics = file_get_contents($this->lyrics_files[0]);
+        $this->lyrics = file_get_contents($lyrics_file);
     }
 
     function fetch_lyrics_online()
     {
+        $result = NULL;
+
         $url = self::SEARCH_URL . self::LYRICS_PATH . $this->id3['song'] . '/' . $this->id3['artist'];
         // curl to SEARCH_URL;
-        // 
-        $result = NULL;
-        $this->lyrics = $result['0']['lrc'];
+        $curl   = new curl_out($url);
+        $result = $curl->send_request();
+
+        if ($result !== false)
+        {
+            $result_arr = json_decode($result, true);
+            debug('result_arr: ' . print_r($result_arr,1));
+            if (
+                is_array($result_arr) === true && 
+                isset($result_arr['result']['0']['lrc']) === true
+               )
+            {
+                $lyrics_url = $result_arr['result']['0']['lrc'];
+                if ($lyrics_url)
+                {
+                    $this->__fetch_lyric($lyrics_url);
+                }
+            }
+        }
+
+        unset($curl);
+        return $result;
     }
 
     function get_ID3()

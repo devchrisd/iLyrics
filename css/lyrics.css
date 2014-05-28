@@ -12,15 +12,22 @@ body
 
 .container-left
 {
-    background: #ccc;
+    background: #aaa;
     width: 65%;
     border-radius: 5px;
 }
 
 .container-right
 {
-    background: #ccc;
+    background: #aaa;
     width: 35%;
+}
+
+.list
+{
+    padding-top: 5px;
+    background: #ccc;
+    width: 90%;
 }
 
 #lyrics {

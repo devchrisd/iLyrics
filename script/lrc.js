@@ -5,19 +5,36 @@ $(function()
 {
     $(window).load(function ()
     {
-        ele_song = $('#song');
+        ele_song = $('#player');
         ele_lyrics = $('#lyrics');
-
+        // ele_song.draggable();
+        // ele_lyrics.draggable();
         getMp3();
-
     });
-});
 
-$('#filelist>ul>li').click(function(){
-    log('clicked');
-    ele_song.empty()
-            .attr('src', 'audio/' + $(this).text())
-            .appendTo(ele_song);
+/*
+    (1) $(document).on('event', 'selector', handler) works for dynamically created elements, 
+    (2) $('selector').on('event', handler) will not work for dynamic delegation.
+     
+    Should $(document).on() be used for everything?
+      It will work but if you don't need the dynamic delegation, it would be more appropriate to use (2) because (1) requires slightly more work from the browser. There won't be any real impact on performance but it makes sense to use the most appropriate method for your use.
+
+    To remove events bound with .on(), see .off(). 
+    To attach an event that runs only once and then removes itself, see .one()
+*/
+   
+    $(document).on('click', '.add_song', function(){
+        // add to playlist
+        $('#playlist').append("<li class='play_song'>" + $(this).text() + "</li>");
+    });
+
+    $(document).on('click', '.play_song', function(){
+        ele_song.empty()
+                .attr('src', 'audio/' + $(this).text())
+                .appendTo(ele_song);
+        getLyrics();
+    });
+
 });
 
 // Get lyrics from server
@@ -33,15 +50,15 @@ function getMp3 ()
         if (mp3)
         {
             $.each(mp3, function(i, val){
-                $('#filelist>ul').append("<li id='" + i + "'>" + val + "</li>");
+                $('#filelist').append("<li class='add_song' id='" + i + "'>" + val + "</li>");
             });
 
+            // load first song
             ele_song.empty()
                     .attr('src', 'audio/' + mp3[0])
                     .appendTo(ele_song);
             //ele_song[0].load();
-            log('song: ' + ele_song.attr('src'));
-
+            // log('song: ' + ele_song.attr('src'));
             getLyrics();
         }
     });
@@ -55,7 +72,6 @@ function getLyrics ()
     var pos = ele_song.attr('src').lastIndexOf("/");
     // attach song_file name to the query
     var url = "get_lyrics.php?id=" + ele_song.attr('src').substring(pos+1);
-
     log('url', url);
 
     // get lyrics in json
@@ -63,13 +79,14 @@ function getLyrics ()
     {
         log('result :', json);
 
-        if (json)
+        if (json && json.length > 0)
         {
             // show lyrics
             lrc.start(ele_song, ele_lyrics, json);
         }
         else
         {
+            lrc.reset();
             setLyrics('No lyrics available.');
         }
     });
@@ -99,8 +116,6 @@ function getLyrics ()
 
     });
 */
-    // var ly = "[ti:Santa Claus Is Coming To Town][ar:Hilary Duff][al:Santa Claus Lane][offset:500][00:00.00]Hilary Duff - Santa Claus Is Coming To Town[00:02.15]Album: Santa Claus Lane[00:03.49][02:44.13](Santa Claus is coming)[00:11.71][02:47.35](Santa Claus is coming to town)[00:22.95][02:25.34]Oh! You better watch out,[00:24.59][02:27.21]You better not cry,[00:26.27][02:28.95]You better not pout,[00:27.78][02:30.40]I'm telling you why,[00:30.34][03:07.46]Santa Claus is coming to town,[00:43.71]He's making a list checkin it twice,[00:47.34]He's gonna find out whos naughty or nice,[01:04.22]He sees you when you're sleeping,[01:07.61]He knows when you're awake,[01:11.13]He knows when you've been bad or good,[01:14.30]So be good for goodness sake![01:17.81]Oh! You better watch out,[01:19.66]You better not cry,[01:21.31]You better not pout,[02:11.85]The kids in Girl and Boy Land[02:15.15]will have a jubilee.[02:18.69]They're gonna build a toyland town[02:22.21]all around the Christmas tree.[02:50.64][02:57.53](Santa Claus come, Santa Claus come, Santa Claus come, come, coming to town)[03:10.45][03:13.90]Santa Claus is coming (He's coming to town)[03:17.38]Santa Claus is coming,[03:21.78]He's coming to town.[03:26.37]<END>"
-    // return ly;
 }
 
 function setLyrics(lyrics)
@@ -108,11 +123,10 @@ function setLyrics(lyrics)
     ele_lyrics.html(lyrics);
 }
 
-
 function log()
 {
     //    var debug = false;
- var debug = true;
+    var debug = true;
     if ( debug && console && console.log )
     {
         for(var i=0; i<arguments.length; i++)
@@ -138,6 +152,22 @@ var lrc = {
     currentLine: 0,     // lyrics line number of the current position
     lytext: new Array(),// lyrics text
     lytime: new Array(),// lyrics time
+    lyricsPlayTimeout: null,
+
+    reset: function()
+    {
+        this.init   = true;
+        this.offset = 0;
+        this.index  = 0;
+        this.lytext = new Array();// lyrics text
+        this.lytime = new Array();// lyrics time
+        this.currentLine    = 0;
+        this.scrollh = 0;
+
+        // clear timer so it won't replace messages in lyrics block
+        if (this.lyricsPlayTimeout !== null)
+            clearTimeout(this.lyricsPlayTimeout);
+    },
 
     // ele_song:   element, 
     // ele_lyrics: element
@@ -146,18 +176,9 @@ var lrc = {
     {
         if (ele_song[0].currentSrc.length > 0)
         {
-            this.init   = true;
-            this.offset = 0;
-            this.index  = 0;
-            this.lytext = new Array();// lyrics text
-            this.lytime = new Array();// lyrics time
-
-            this.currentLine    = 0;
+            this.reset();
             this.elementSong    = ele_song;
             this.elementLyrics  = ele_lyrics;
-
-            this.scrollh = 0;
-
             this.processData(lrc_lyrics);
             // sort by show time
             this.sortAr();
@@ -168,9 +189,7 @@ var lrc = {
             this.lytime[this.index] = this.lytime[this.index-1] + 5;
 
             this.scrollBar();
-            window.setTimeout("lrc.lyricsPlay()",100);
-            // this.elementLyrics.draggable();
-            // this.elementSong.draggable();
+            this.setLyricsPlayTimeOut();
         }
     },
 
@@ -346,19 +365,25 @@ var lrc = {
         return false;
     },
 
+    setLyricsPlayTimeOut: function()
+    {
+        this.lyricsPlayTimeout = window.setTimeout("lrc.lyricsPlay()",100);
+        return;
+    },
+
     // show lyrics
     lyricsPlay: function ()
     {
         if ( this.isPlaying() === false )
         {
-            window.setTimeout("lrc.lyricsPlay()",100);
+            this.setLyricsPlayTimeOut();
             return;
         }
 
         this.show();
         this.init = false;
 
-        window.setTimeout("lrc.lyricsPlay()",100);
+        this.setLyricsPlayTimeOut();
     },
 
     // fill lyrics into div

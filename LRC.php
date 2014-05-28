@@ -1,6 +1,4 @@
 <?php
-    date_default_timezone_set('America/Toronto');
-
     // get current playing / selected song
     $song = "NineMillionBicycles.mp3";
     $song = "test.mp3";
@@ -27,23 +25,22 @@
             <h1>iLyrics</h1>
         </header>
 
-        <div id='div_song'>
-            <audio id='song' src="" controls></audio>
+        <div id='div_player'>
+            <audio id='player' src="" controls></audio>
             <figure><img id='artist_avatar' alt='artist' src='images/dou.jpg' /></figure>
         </div>
         <div id='lyrics'>Fetching lyrics ...</div> 
     </section>
 
     <section class='container-right'>
-        <div id='filelist'>
-            <ul id='files'>
+        <div class='list'>
+            <ul id='filelist'>
 
             </ul>
         </div>
-        <div id='playlist'>
-            <ul>
-                <li>play 1</li>
-                <li>play 2</li>
+
+        <div class='list'>
+            <ul id='playlist'>
             </ul>
         </div> 
     </section>
