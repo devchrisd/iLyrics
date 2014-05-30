@@ -26,23 +26,26 @@
         </header>
 
         <div id='div_player'>
-            <audio id='player' src="" controls></audio>
-            <figure><img id='artist_avatar' alt='artist' src='images/dou.jpg' /></figure>
+            <div>
+                <audio id='player' controls playbackrate='1.0' autoplay>
+                    <p>Your browser does not support the audio element.</p>
+                </audio>
+                <figure><img id='artist_avatar' alt='artist' src='images/dou.jpg' /></figure>
+            </div>
+            <div class='list'>
+                <ul id='playlist'>
+                </ul>
+            </div>
         </div>
-        <div id='lyrics'>Fetching lyrics ...</div> 
     </section>
 
     <section class='container-right'>
+        <div id='lyrics'>Fetching lyrics ...</div> 
         <div class='list'>
             <ul id='filelist'>
 
             </ul>
         </div>
-
-        <div class='list'>
-            <ul id='playlist'>
-            </ul>
-        </div> 
     </section>
 
     <footer>

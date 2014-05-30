@@ -3,7 +3,8 @@ Testing Environment:
  - Mac OSX 10.9.3
  - Apache 2.2.26
  - MySQL 5.6.16
- - PHP 5.4.24, with PEAR/PECL installed
+ - PHP 5.4.24, 
+ - PEAR/PECL with ID3 installed
 
 
 

@@ -13,14 +13,14 @@ body
 .container-left
 {
     background: #aaa;
-    width: 65%;
+    width: 39%;
     border-radius: 5px;
 }
 
 .container-right
 {
     background: #aaa;
-    width: 35%;
+    width: 61%;
 }
 
 .list
@@ -28,6 +28,18 @@ body
     padding-top: 5px;
     background: #ccc;
     width: 90%;
+}
+
+.remove
+{
+    margin: 0;
+    float: right;
+}
+
+.current_song
+{
+    color:blue;
+    font-weight:bold;
 }
 
 #lyrics {

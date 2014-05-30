@@ -1,5 +1,6 @@
 var ele_song;   // element contains the song
 var ele_lyrics; // element contains the lyrics
+var play_index;   // current position in playlist
 
 $(function()
 {
@@ -7,6 +8,7 @@ $(function()
     {
         ele_song = $('#player');
         ele_lyrics = $('#lyrics');
+        play_index = 0;
         // ele_song.draggable();
         // ele_lyrics.draggable();
         getMp3();
@@ -25,16 +27,50 @@ $(function()
    
     $(document).on('click', '.add_song', function(){
         // add to playlist
-        $('#playlist').append("<li class='play_song'>" + $(this).text() + "</li>");
+        $('#playlist').append(
+                                "<li class='play_song'>" + 
+                                $(this).text() + 
+                                "<img class='remove' alt='--' /></li>"
+                            );
+    });
+
+    $(document).on('click', '.remove', function(){
+        if ($(this).parent().index() < play_index)
+        {
+            play_index--;
+        }
+        else if ($(this).parent().index() == play_index)
+        {
+            alert('current_song cannot remove now.');
+            return;
+        }
+        $(this).parent().detach();
     });
 
     $(document).on('click', '.play_song', function(){
         ele_song.empty()
                 .attr('src', 'audio/' + $(this).text())
                 .appendTo(ele_song);
+
+        if ($(this).prev())
+        {
+            $(this).prev().removeClass('current_song');
+        }
+        $(this).addClass('current_song');
+
         getLyrics();
     });
 
+    // play next song in playlist
+    $('#player').on('ended', function(){
+        play_index++;
+        play_list_len = $('#playlist>.play_song').length;
+        if ( play_list_len > 0 && play_index < play_list_len)
+        {
+            next_play = play_index+1;
+            $('.play_song:nth-child('+next_play+')').trigger('click');
+        }
+    });
 });
 
 // Get lyrics from server
@@ -57,9 +93,10 @@ function getMp3 ()
             ele_song.empty()
                     .attr('src', 'audio/' + mp3[0])
                     .appendTo(ele_song);
-            //ele_song[0].load();
-            // log('song: ' + ele_song.attr('src'));
-            getLyrics();
+
+            // add first song to playlist
+            $('#filelist>li:first').trigger( "click" );
+            $('.play_song:first()').trigger('click');
         }
     });
 
@@ -77,7 +114,7 @@ function getLyrics ()
     // get lyrics in json
     $.getJSON(url, function (json)
     {
-        log('result :', json);
+        // log('result :', json);
 
         if (json && json.length > 0)
         {
@@ -174,7 +211,7 @@ var lrc = {
     // lrc_lyrics: lyrics content
     start: function(ele_song, ele_lyrics, lrc_lyrics)
     {
-        if (ele_song[0].currentSrc.length > 0)
+        if (ele_song.attr('src').length > 0)
         {
             this.reset();
             this.elementSong    = ele_song;
