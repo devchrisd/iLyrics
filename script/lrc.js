@@ -1,14 +1,15 @@
 var ele_song;   // element contains the song
 var ele_lyrics; // element contains the lyrics
 var play_index;   // current position in playlist
+var loop;
 
 $(function()
 {
     $(window).load(function ()
     {
-        ele_song = $('#player');
-        ele_lyrics = $('#lyrics');
-        play_index = 0;
+        ele_song    = $('#player');
+        ele_lyrics  = $('#lyrics');
+        loop        = true;
         // ele_song.draggable();
         // ele_lyrics.draggable();
         getMp3();
@@ -24,52 +25,65 @@ $(function()
     To remove events bound with .on(), see .off(). 
     To attach an event that runs only once and then removes itself, see .one()
 */
-   
+    // add song to playlist
     $(document).on('click', '.add_song', function(){
         // add to playlist
         $('#playlist').append(
-                                "<li class='play_song'>" + 
+                                "<li><span class='play_song'>" + 
                                 $(this).text() + 
-                                "<img class='remove' alt='--' /></li>"
+                                "</span><img class='remove' alt='--' /></li>"
                             );
     });
 
+    // remove from list
     $(document).on('click', '.remove', function(){
-        if ($(this).parent().index() < play_index)
+
+        if ($(this).parent().index() == $('.current_song').parent().index())
         {
-            play_index--;
-        }
-        else if ($(this).parent().index() == play_index)
-        {
-            alert('current_song cannot remove now.');
+            alert('cannot remove current_song.');
             return;
         }
+
         $(this).parent().detach();
     });
 
     $(document).on('click', '.play_song', function(){
+
+        if ($('.current_song')[0])
+        {
+            if ($(this).index('.play_song') == $('.current_song').index('.play_song'))
+            {
+                return;     // no change needed
+            }
+
+            $('.current_song').removeClass('current_song');
+        }
+        $(this).addClass('current_song');
+
         ele_song.empty()
                 .attr('src', 'audio/' + $(this).text())
                 .appendTo(ele_song);
-
-        if ($(this).prev())
-        {
-            $(this).prev().removeClass('current_song');
-        }
-        $(this).addClass('current_song');
 
         getLyrics();
     });
 
     // play next song in playlist
     $('#player').on('ended', function(){
-        play_index++;
-        play_list_len = $('#playlist>.play_song').length;
+        play_index = $('.current_song').index('.play_song');
+        play_list_len = $('.play_song').length - 1;
+
+        next_play = false;
         if ( play_list_len > 0 && play_index < play_list_len)
         {
             next_play = play_index+1;
-            $('.play_song:nth-child('+next_play+')').trigger('click');
         }
+        else if (loop === true)
+        {
+            next_play = 0;
+        }
+
+        if (!isNaN(next_play))
+            $('.play_song').slice(next_play,next_play+1).trigger('click');
     });
 });
 
