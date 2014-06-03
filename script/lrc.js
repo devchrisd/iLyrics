@@ -128,7 +128,7 @@ function getLyrics ()
     // get lyrics in json
     $.getJSON(url, function (json)
     {
-        // log('result :', json);
+        log('result :', json);
 
         if (json && json.length > 0)
         {
