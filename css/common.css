@@ -12,7 +12,10 @@ body {
 
 html {height:100%; }
 
-html>body div, html>body div * {position:static} /* good browsers */
+html>body div, html>body div * 
+{
+    position:static;  /* good browsers */
+}
 
 footer{
     width: 100%;

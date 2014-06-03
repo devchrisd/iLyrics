@@ -10,6 +10,7 @@ $(function()
         ele_song    = $('#player');
         ele_lyrics  = $('#lyrics');
         loop        = true;
+        $('#loop_status').text('On');
         // ele_song.draggable();
         // ele_lyrics.draggable();
         getMp3();
@@ -31,7 +32,7 @@ $(function()
         $('#playlist').append(
                                 "<li><span class='play_song'>" + 
                                 $(this).text() + 
-                                "</span><img class='remove' alt='--' /></li>"
+                                "</span><img class='remove' alt='X' /></li>"
                             );
     });
 
@@ -80,10 +81,27 @@ $(function()
         else if (loop === true)
         {
             next_play = 0;
+            $('.current_song').removeClass('current_song');
         }
 
-        if (!isNaN(next_play))
+        if (next_play !== false)
+        {
+        log(' next_play = ' + next_play);
+
             $('.play_song').slice(next_play,next_play+1).trigger('click');
+        }
+    });
+
+    $('.loop').on('click', function(){
+        var status = 'On';
+
+        loop = !loop;
+        if (loop === false)
+        {
+            status = 'Off';
+        }
+        $('#loop_status').text(status);
+
     });
 });
 
@@ -128,7 +146,7 @@ function getLyrics ()
     // get lyrics in json
     $.getJSON(url, function (json)
     {
-        log('result :', json);
+        // log('result :', json);
 
         if (json && json.length > 0)
         {
@@ -455,7 +473,7 @@ var lrc = {
             {
                 this.currentLine = k;
                 this.elementLyrics.append("<span class='current_line'>"+this.lytext[k]+"</span><br>");
-                log('current line: ' + k);
+                // log('current line: ' + k);
             }
             else
             {

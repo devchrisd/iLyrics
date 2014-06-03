@@ -206,7 +206,8 @@ $id3["comment"];
         }
         else
         {
-            $url = self::SEARCH_URL . self::LYRICS_PATH . $this->filename;
+            $url = self::SEARCH_URL . self::LYRICS_PATH
+                     . substr($this->filename, 0, strrpos($this->filename, '.'));
         }
 
         // curl to SEARCH_URL;

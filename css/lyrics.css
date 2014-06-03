@@ -13,14 +13,14 @@ body
 .container-left
 {
     background: #aaa;
-    width: 39%;
+    width: 350px;
+    /*height: 100%;*/
     border-radius: 5px;
 }
 
 .container-right
 {
     background: #aaa;
-    width: 61%;
 }
 
 .list
@@ -30,8 +30,27 @@ body
     width: 90%;
 }
 
+.list > ul > li
+{
+    cursor:pointer;
+}
+
+figure
+{
+    margin: 0;
+    padding: 0;
+}
+
+#artist_avatar
+{
+    margin: 0;
+    padding: 0;
+    /*float: right;*/
+}
+
 .remove
 {
+    cursor:pointer;
     margin: 0;
     float: right;
 }
@@ -58,4 +77,18 @@ body
 {
     color:blue;
     font-weight:bold;
+}
+
+.loop
+{
+    cursor:pointer;
+    margin: 0;
+    padding: 0;
+    float: right;
+}
+
+#loop_status
+{
+    float: right;
+    font-size:10px;
 }

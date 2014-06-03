@@ -33,7 +33,11 @@
                 <figure><img id='artist_avatar' alt='artist' src='images/dou.jpg' /></figure>
             </div>
             <div class='list'>
-                Playlist
+                <h3>
+                    Playlist
+                    <img class='loop' alt='O' src='images/loop-square_25.jpg' />
+                    <span id='loop_status'></span>
+                </h3>
                 <ul id='playlist'>
                 </ul>
             </div>
@@ -43,7 +47,7 @@
     <section class='container-right'>
         <div id='lyrics'>Fetching lyrics ...</div> 
         <div class='list'>
-            Library:
+            <h3>Library</h3>
             <ul id='filelist'>
 
             </ul>
