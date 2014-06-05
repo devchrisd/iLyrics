@@ -102,12 +102,10 @@ $id3["comment"];
                 self::LYRICS_PATH . $artist . '_' . $song . '.lrc',
                 self::LYRICS_PATH . $song . '.lrc',
                 );
-            debug('ID3: ' . print_r($this->id3,1));
         }
-        else
-        {
-            debug('No ID3 available for ' . $this->song_file);
-        }
+
+        debug(__METHOD__ . ' ID3 for ' . $this->song_file . ':' . $this->id3);
+
         $this->lyrics_files[] = self::LYRICS_PATH . substr($filename, 0, strrpos($filename, '.')) . '.lrc';
     }
 /*
@@ -161,10 +159,8 @@ $id3["comment"];
 
                 return TRUE;
             }
-            else
-            {
-                debug('File ' . $lyrics . ' does not exist.');
-            }
+
+            debug('File ' . $lyrics . ' does not exist.');
         }
 
         return FALSE;
@@ -200,35 +196,72 @@ $id3["comment"];
     {
         $result = NULL;
 
+        $url = self::SEARCH_URL . self::LYRICS_PATH
+                 . substr($this->filename, 0, strrpos($this->filename, '.'));
         if ($this->id3 !== NULL)
         {
             $url = self::SEARCH_URL . self::LYRICS_PATH . $this->id3['song'] . '/' . $this->id3['artist'];
         }
-        else
-        {
-            $url = self::SEARCH_URL . self::LYRICS_PATH
-                     . substr($this->filename, 0, strrpos($this->filename, '.'));
-        }
 
-        // curl to SEARCH_URL;
-        $curl   = new curl_out($url);
-        $result = $curl->send_request();
+        try {
+            // curl to SEARCH_URL;
+            $curl   = new curl_out($url);
+            $result = $curl->send_request();
 
-        if ($result !== false)
-        {
-            $result_arr = json_decode($result, true);
-            debug('online result_arr: ' . print_r($result_arr,1));
-            if (
-                is_array($result_arr) === true && 
-                isset($result_arr['result']['0']['lrc']) === true
-               )
+            if ($result !== false)
             {
-                $lyrics_url = $result_arr['result']['0']['lrc'];
-                if ($lyrics_url)
+                $response_header = $curl->getHeaders();
+                if ($response_header['http_code'] !== '200')
                 {
-                    $this->__fetch_lyric($lyrics_url, true);
+                    throw new Exception('online search Got ' . $response_header['http_code'] . ' ! ! !');
+                }
+                $result_arr = json_decode($result, true);
+                debug('online result_arr: ' . print_r($result_arr,1));
+
+                if (
+                    is_array($result_arr) === true && 
+                    isset($result_arr['count']) &&
+                    $result_arr['count'] > 0 &&
+                    count($result_arr['result']) > 0
+                   )
+                {
+                    $count = 0;
+                    foreach ($result_arr['result'] as $key => $lrc_arr)
+                    {
+                        $count++;
+                        if (isset($lrc_arr['lrc']) === true && !empty($lrc_arr['lrc']))
+                        {
+                            $lyrics_url = $lrc_arr['lrc'];
+
+                            debug(__METHOD__ . ' lyrics_url: ' . $lyrics_url);
+
+                            $curl->set_para($lyrics_url);
+                            $this->lyrics = $curl->send_request();
+                            $response_header = $curl->getHeaders();
+                            if ($response_header['http_code'] !== '200')
+                            {
+                                $this->lyrics = '';
+                                debug(__METHOD__ . " :$count: online Lyrics Got " . $response_header['http_code'] . ' ! ! ! ');
+                            }
+
+                            if ($this->lyrics !== '')
+                            {
+                                debug(__METHOD__ . " :$count: Save online lyrics to file: " . $this->lyrics_files[0]);
+
+                                $fp = fopen($this->lyrics_files[0], 'w');
+                                fputs($fp, $this->lyrics);
+                                fclose($fp);
+                                break;
+                            }
+                            // $this->__fetch_lyric($lyrics_url, true);
+                        }
+
+                    }
                 }
             }
+
+        } catch (Exception $e) {
+            debug('Exception ' . $e->getMessage());
         }
 
         unset($curl);
@@ -237,8 +270,43 @@ $id3["comment"];
 
     function get_ID3()
     {
-        $id3 = NULL;
+        require_once('getid3/getid3.php');
 
+        // Initialize getID3 engine
+        $getID3 = new getID3;
+
+        $id3 = NULL;
+        // Analyze file and store returned data in $ThisFileInfo
+        $ThisFileInfo = $getID3->analyze($this->song_file);
+        /*
+         Optional: copies data from all subarrays of [tags] into [comments] so
+         metadata is all available in one location for all tag formats
+         metainformation is always available under [tags] even if this is not called
+        */
+        getid3_lib::CopyTagsToComments($ThisFileInfo);
+        if (isset($ThisFileInfo['comments']) && !empty($ThisFileInfo['comments']))
+        {
+            debug(print_r($ThisFileInfo['comments'],1));
+
+            $id3['song'] = $ThisFileInfo['comments']['title'][0];
+            $id3['artist'] = $ThisFileInfo['comments']['artist'][0];
+            $id3['album'] = $ThisFileInfo['comments']['album'][0];
+            $id3['year'] = $ThisFileInfo['comments']['year'][0];
+            $id3['genre'] = $ThisFileInfo['comments']['genre'][0];
+            $id3['unsynchronised_lyric'] = $ThisFileInfo['comments']['unsynchronised_lyric'][0];
+        }
+
+        if (!isset($id3['song']) || empty($id3['song']))
+        {
+            $id3['song'] = substr($this->filename, 0, strrpos($this->filename, '.'));
+        }
+
+        return $id3;
+    }
+
+/*
+    function get_ID3_old()
+    {
         $version = id3_get_version( $this->song_file );
         if ($version & ID3_V2_4) 
         {
@@ -287,28 +355,7 @@ $id3["comment"];
             // $tag = id3_get_tag( $tag_song , ID3_BEST);
         }
 
-        require_once('getid3/getid3.php');
-
-        // Initialize getID3 engine
-        $getID3 = new getID3;
-
-        // Analyze file and store returned data in $ThisFileInfo
-        $ThisFileInfo = $getID3->analyze($this->song_file);
-        /*
-         Optional: copies data from all subarrays of [tags] into [comments] so
-         metadata is all available in one location for all tag formats
-         metainformation is always available under [tags] even if this is not called
-        */
-        getid3_lib::CopyTagsToComments($ThisFileInfo);
-        if (isset($ThisFileInfo['comments']) && !empty($ThisFileInfo['comments']))
-        {
-            $id3['song'] = $ThisFileInfo['comments']['title'][0];
-            $id3['artist'] = $ThisFileInfo['comments']['artist'][0];
-        }
-
-        return $id3;
     }
-
     //Reads ID3v1 from a MP3 file and displays it
     function get_ID3_v1()
     {
@@ -380,5 +427,5 @@ $id3["comment"];
         
         return $data;
     }
-
+*/
 }

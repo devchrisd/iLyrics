@@ -3,6 +3,16 @@ body
     width: 800px;
 }
 
+header
+{
+    width:100%;
+    height:60px;
+    border-radius:5px;
+    background:#636363;
+    border:1px solid #cccccc;
+    position:absolute;
+}
+
 .container
 {
     clear: both;
@@ -23,11 +33,21 @@ body
     background: #aaa;
 }
 
+.div-list
+{
+    border: 1px solid #333;
+    margin: 0px;
+}
+
 .list
 {
-    padding-top: 5px;
+    padding-left: 5px;
     background: #ccc;
-    width: 90%;
+    margin: 0px;
+
+    height:100px;
+    overflow-y:scroll;
+    text-align:left;
 }
 
 .list > ul > li
@@ -48,13 +68,6 @@ figure
     /*float: right;*/
 }
 
-.remove
-{
-    cursor:pointer;
-    margin: 0;
-    float: right;
-}
-
 .current_song
 {
     color:blue;
@@ -68,6 +81,7 @@ figure
     text-align:left;
     font-size:13px;
 
+    margin: 0px;
     padding-top:50px;
     padding-left:20px;
     padding-bottom:50px;
@@ -79,11 +93,10 @@ figure
     font-weight:bold;
 }
 
-.loop
+.tag, .remove, .loop
 {
     cursor:pointer;
     margin: 0;
-    padding: 0;
     float: right;
 }
 

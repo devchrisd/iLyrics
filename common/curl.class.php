@@ -1,4 +1,5 @@
 <?php
+require_once('common.php');
 
 class curl_out
 {
@@ -10,10 +11,7 @@ class curl_out
 
     function __construct($url, $request='', $curl_send='get')
     {
-        $this->url       = $url;
-        $this->curl_send = $curl_send;
-        $this->post_data = $request;
-        $this->response  = false;
+        $this->set_para($url, $request, $curl_send);
     }
 
     function set_para($url, $request='', $curl_send='get')
@@ -22,6 +20,7 @@ class curl_out
         $this->curl_send = $curl_send;
         $this->post_data = $request;
         $this->response  = false;
+        $this->response_meta_info = null;
     }
 
     function send_request()
@@ -33,20 +32,19 @@ class curl_out
         curl_setopt($ch, CURLOPT_RETURNTRANSFER,    1);
 
         if ($this->curl_send == 'post')
+        {
             curl_setopt($ch, CURLOPT_POST,              1);
-        else
-            curl_setopt($ch, CURLOPT_HTTPGET,           1);
-
+            curl_setopt($ch, CURLOPT_POSTFIELDS,        $this->post_data);
+        }
 
         curl_setopt($ch, CURLOPT_HEADER,            0);
 //        curl_setopt($ch, CURLOPT_HEADER,            1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS,        $this->post_data);
         curl_setopt($ch, CURLOPT_URL,               $this->url);
 
         //register a callback function which will process the headers
         //this assumes your code is into a class method, and uses $this->readHeader as the callback
         //function
-        curl_setopt($ch, CURLOPT_HEADERFUNCTION,    array(&$this,'readHeader'));
+        // curl_setopt($ch, CURLOPT_HEADERFUNCTION,    array(&$this,'readHeader'));
 
         //Some servers (like Lighttpd) will not process the curl request without this header and will return error code 417 instead.
         //Apache does not need it, but it is safe to use it there as well.
@@ -63,11 +61,14 @@ class curl_out
         debug( __METHOD__ . " header = ". print_r($headers,1));
 
         //add the headers from the custom headers callback function
-        $this->response_meta_info = array_merge($headers, $this->response_meta_info);
+        if (isset($this->response_meta_info) && !empty($this->response_meta_info))
+            $this->response_meta_info = array_merge($headers, $this->response_meta_info);
+        else
+            $this->response_meta_info = $headers;
 
         if (($errno = curl_errno($ch)) > 0)
         {
-             print "ERROR: $errno: " . curl_error($ch) . "\n";
+             debug(" CURL ERROR: $errno: " . curl_error($ch) );
         }
         curl_close($ch);
 
@@ -83,6 +84,7 @@ class curl_out
 
         }
         debug(__METHOD__. ',response :' . print_r($this->response,1));
+        debug(__METHOD__. ',response_meta_info :' . print_r($this->response_meta_info,1));
 
         return $this->response;
     }
