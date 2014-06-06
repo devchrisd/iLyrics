@@ -211,7 +211,7 @@ $id3["comment"];
             if ($result !== false)
             {
                 $response_header = $curl->getHeaders();
-                if ($response_header['http_code'] !== '200')
+                if ($response_header['http_code'] !== 200)
                 {
                     throw new Exception('online search Got ' . $response_header['http_code'] . ' ! ! !');
                 }
@@ -238,7 +238,7 @@ $id3["comment"];
                             $curl->set_para($lyrics_url);
                             $this->lyrics = $curl->send_request();
                             $response_header = $curl->getHeaders();
-                            if ($response_header['http_code'] !== '200')
+                            if ($response_header['http_code'] !== 200)
                             {
                                 $this->lyrics = '';
                                 debug(__METHOD__ . " :$count: online Lyrics Got " . $response_header['http_code'] . ' ! ! ! ');
