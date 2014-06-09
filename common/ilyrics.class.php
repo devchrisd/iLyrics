@@ -1,4 +1,5 @@
 <?php
+require_once('configure.class.php');
 require_once('common.php');
 require_once('curl.class.php');
 
@@ -64,14 +65,16 @@ require_once('curl.class.php');
     */
 class ilyrics
 {
-    const SEARCH_URL    = 'http://geci.me/api/';
+    const SEARCH_URL    = Configure::SEARCH_URL;
 
-    const LYRICS_PATH   = 'lyric/';
-    const COVER_PATH    = 'images/cover/';
-    const AUDIO_PATH    = 'audio/';
+    const LYRICS_PATH   = Configure::LYRICS_PATH;
+    const COVER_PATH    = Configure::COVER_PATH;
+    const AUDIO_PATH    = Configure::AUDIO_PATH;
+    const MEDIA_DB      = Configure::MEDIA_DB;
 
     public $id3;
     public $lyrics;
+    public $cover_file;
 /*
 $id3["song"];
 $id3["artist"];
@@ -83,8 +86,11 @@ $id3["comment"];
     private $song_file;
     private $lyrics_files;
 
+    // $filename: file name only, no path included
     function __construct($filename)
     {
+        // Get song info from DB
+        $this->song_info    = $this->get_song_info($filename);
         $this->song_file    = self::AUDIO_PATH . $filename;
         $this->filename     = $filename;
         $this->lyrics       = '';
@@ -94,6 +100,7 @@ $id3["comment"];
         // build possible lyrics file name
         if ($this->id3 !== NULL)
         {
+            // get possible lyrics file name
             $song     = $this->id3['song'];
             $artist   = $this->id3['artist'];
             $song   = preg_replace('/\s+/', '', $song);
@@ -102,9 +109,11 @@ $id3["comment"];
                 self::LYRICS_PATH . $artist . '_' . $song . '.lrc',
                 self::LYRICS_PATH . $song . '.lrc',
                 );
+
+            $this->cover_file = self::COVER_PATH . $artist . '_' . $song;
         }
 
-        debug(__METHOD__ . ' ID3 for ' . $this->song_file . ':' . $this->id3);
+        debug(__METHOD__ . ' ID3 for ' . $this->song_file . ':' . print_r($this->id3,1));
 
         $this->lyrics_files[] = self::LYRICS_PATH . substr($filename, 0, strrpos($filename, '.')) . '.lrc';
     }
@@ -117,9 +126,17 @@ $id3["comment"];
     }
 */
 
+    function get_song_info($filename)
+    {
+        $song_info = NULL;
+        $query = 'select * from ' . self::MEDIA_DB . '.song WHERE filename="' . $filename .'"';
+
+        return $song_info;
+    }
+
     function fetch()
     {
-        $result = $this->get_lyrics_local();
+        $result = $this->is_lyrics_local();
         if ($result !== FALSE)
         {
             debug( "get file " . $this->lyrics_files[0]);
@@ -135,7 +152,7 @@ $id3["comment"];
     }
 
     // is the lyrics already in database
-    function get_lyrics_local()
+    function is_lyrics_local()
     {
         if (count($this->lyrics_files) == 0)
         {
@@ -143,15 +160,15 @@ $id3["comment"];
             return FALSE;
         }
 
-        foreach ($this->lyrics_files as $key => $lyrics)
+        foreach ($this->lyrics_files as $key => $lyrics_file)
         {
-            if (file_exists($lyrics))
+            if (file_exists($lyrics_file))
             {
                 // rename into format of ARTIST_SONG.lrc, if it's not.
                 if ($key !== 0)
                 {
-                    debug("rename $lyrics to" . $this->lyrics_files[0]);
-                    if (rename($lyrics, $this->lyrics_files[0]))
+                    debug("rename $lyrics_file to" . $this->lyrics_files[0]);
+                    if (rename($lyrics_file, $this->lyrics_files[0]))
                     {
                         debug('rename done');
                     }
@@ -160,7 +177,7 @@ $id3["comment"];
                 return TRUE;
             }
 
-            debug('File ' . $lyrics . ' does not exist.');
+            debug('File ' . $lyrics_file . ' does not exist.');
         }
 
         return FALSE;
@@ -177,18 +194,24 @@ $id3["comment"];
         if ($bSave === true)
         {
             // save lyrics
-            try
-            {
-                debug('Save online lyrics to file: ' . $this->lyrics_files[0]);
+            $this->__save_file($this->lyrics_files[0], $this->lyrics);
+        }
+    }
 
-                $fp = fopen($this->lyrics_files[0], 'w');
-                fputs($fp, $this->lyrics);
-                fclose($fp);
-            }
-            catch(Exception $e)
-            {
-                debug( 'Exception caught: ' . $e->getMessage() . "\n");
-            }
+    function __save_file($file, $contents)
+    {
+        // if (file_exists($file)) return true;
+
+        try
+        {
+            debug('Save file: ' . $file);
+            $fp = fopen($file, 'w');
+            fputs($fp, $contents);
+            fclose($fp);
+        }
+        catch(Exception $e)
+        {
+            debug( 'Exception caught: ' . $e->getMessage() . "\n");
         }
     }
 
@@ -248,14 +271,33 @@ $id3["comment"];
                             {
                                 debug(__METHOD__ . " :$count: Save online lyrics to file: " . $this->lyrics_files[0]);
 
-                                $fp = fopen($this->lyrics_files[0], 'w');
-                                fputs($fp, $this->lyrics);
-                                fclose($fp);
+                                $this->__save_file($this->lyrics_files[0], $this->lyrics);
+
+                        if (isset($lrc_arr['aid']) === true)
+                        {
+                            // get cover:         http://geci.me/api/cover/AlbumId
+                            $cover_url = self::SEARCH_URL . 'cover/'. $lrc_arr['aid'];
+                            $curl->set_para($cover_url);
+                            $cover_arr = json_decode($curl->send_request(), true);
+
+                            debug('get cover file: ' . print_r($cover_arr,1));
+
+debug('thumb : ' . $cover_arr['result']['thumb']);
+                            if (isset($cover_arr['result']['thumb']) === true &&
+                                empty($cover_arr['result']['thumb']) === false
+                                )
+                            {
+                                $imagefile = $cover_arr['result']['thumb'];
+                                debug(' image file: ' .$imagefile);
+                                $this->cover_file .= '.' . substr($imagefile, strrpos($imagefile, '.')+1);
+                                debug('save cover file: ' . $this->cover_file);
+                                $this->__save_file($this->cover_file, file_get_contents($imagefile));
+                            }
+                        }
                                 break;
                             }
                             // $this->__fetch_lyric($lyrics_url, true);
                         }
-
                     }
                 }
             }
@@ -286,14 +328,15 @@ $id3["comment"];
         getid3_lib::CopyTagsToComments($ThisFileInfo);
         if (isset($ThisFileInfo['comments']) && !empty($ThisFileInfo['comments']))
         {
-            debug(print_r($ThisFileInfo['comments'],1));
+            // debug(print_r($ThisFileInfo['comments'],1));
 
             $id3['song'] = $ThisFileInfo['comments']['title'][0];
             $id3['artist'] = $ThisFileInfo['comments']['artist'][0];
             $id3['album'] = $ThisFileInfo['comments']['album'][0];
             $id3['year'] = $ThisFileInfo['comments']['year'][0];
             $id3['genre'] = $ThisFileInfo['comments']['genre'][0];
-            $id3['unsynchronised_lyric'] = $ThisFileInfo['comments']['unsynchronised_lyric'][0];
+            if (isset($ThisFileInfo['comments']['unsynchronised_lyric']))
+                $id3['unsynchronised_lyric'] = $ThisFileInfo['comments']['unsynchronised_lyric'][0];
         }
 
         if (!isset($id3['song']) || empty($id3['song']))

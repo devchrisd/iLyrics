@@ -109,7 +109,7 @@ var lrc = {
     // parsing the Lyrics 
     processData: function (data)
     {
-        var arr_lyrics;
+        var arr_lyrics = null;
         var l_time,l_ww,i,ii;
         var sec, pos;
 

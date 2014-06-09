@@ -62,7 +62,7 @@ $(function()
         $(this).addClass('current_song');
 
         ele_song.empty()
-                .attr('src', 'audio/' + $(this).text())
+                .attr('src', $(this).text())
                 .appendTo(ele_song);
 
         getLyrics();
@@ -140,7 +140,7 @@ function getMp3 ()
 
             // load first song
             ele_song.empty()
-                    .attr('src', 'audio/' + mp3[0])
+                    .attr('src', mp3[0])
                     .appendTo(ele_song);
 
             // add first song to playlist
