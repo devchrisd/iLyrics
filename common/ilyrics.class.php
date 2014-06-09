@@ -2,6 +2,7 @@
 require_once('configure.class.php');
 require_once('common.php');
 require_once('curl.class.php');
+require_once('mp3_lib.class.php');
 
     /*
     
@@ -95,7 +96,7 @@ $id3["comment"];
         $this->filename     = $filename;
         $this->lyrics       = '';
 
-        $this->id3      = $this->get_ID3($this->song_file);
+        $this->id3      = mp3_lib::get_ID3($this->song_file);
 
         // build possible lyrics file name
         if ($this->id3 !== NULL)
@@ -309,166 +310,4 @@ debug('thumb : ' . $cover_arr['result']['thumb']);
         unset($curl);
         return $result;
     }
-
-    function get_ID3()
-    {
-        require_once('getid3/getid3.php');
-
-        // Initialize getID3 engine
-        $getID3 = new getID3;
-
-        $id3 = NULL;
-        // Analyze file and store returned data in $ThisFileInfo
-        $ThisFileInfo = $getID3->analyze($this->song_file);
-        /*
-         Optional: copies data from all subarrays of [tags] into [comments] so
-         metadata is all available in one location for all tag formats
-         metainformation is always available under [tags] even if this is not called
-        */
-        getid3_lib::CopyTagsToComments($ThisFileInfo);
-        if (isset($ThisFileInfo['comments']) && !empty($ThisFileInfo['comments']))
-        {
-            // debug(print_r($ThisFileInfo['comments'],1));
-
-            $id3['song'] = $ThisFileInfo['comments']['title'][0];
-            $id3['artist'] = $ThisFileInfo['comments']['artist'][0];
-            $id3['album'] = $ThisFileInfo['comments']['album'][0];
-            $id3['year'] = $ThisFileInfo['comments']['year'][0];
-            $id3['genre'] = $ThisFileInfo['comments']['genre'][0];
-            if (isset($ThisFileInfo['comments']['unsynchronised_lyric']))
-                $id3['unsynchronised_lyric'] = $ThisFileInfo['comments']['unsynchronised_lyric'][0];
-        }
-
-        if (!isset($id3['song']) || empty($id3['song']))
-        {
-            $id3['song'] = substr($this->filename, 0, strrpos($this->filename, '.'));
-        }
-
-        return $id3;
-    }
-
-/*
-    function get_ID3_old()
-    {
-        $version = id3_get_version( $this->song_file );
-        if ($version & ID3_V2_4) 
-        {
-            $id3_version = ID3_V2_4;
-            debug( "Contains a 2.4 tag".PHP_EOL);
-        }
-        elseif ($version & ID3_V2_3) 
-        {
-            $id3_version = ID3_V2_3;
-            debug( "Contains a 2.3 tag".PHP_EOL);
-        }
-        elseif ($version & ID3_V2_2) 
-        {
-            $id3_version = ID3_V2_2;
-            debug( "Contains a 2.2 tag".PHP_EOL);
-        }
-        elseif ($version & ID3_V2_1) 
-        {
-            $id3_version = ID3_V2_1;
-            debug( "Contains a 2.1 tag".PHP_EOL);
-        }
-        elseif( $version & ID3_V1_1)
-        {
-            debug( "Contains a 1.1 tag". PHP_EOL);
-            // $id3_version = ID3_V1_1;
-            $id3_version = 1;
-        }
-        elseif ($version & ID3_V1_0 )
-        {
-            debug( "Contains a 1.0 tag". PHP_EOL);
-            // $id3_version = ID3_V1_0;
-            $id3_version = 1;
-        }
-        else{
-            $id3_version = $version;
-        }
-
-        if ($id3_version === 1)
-        {
-            $id3 = $this->get_ID3_v1();
-        }
-        else
-        {
-            // ini_set('memory_limit', '1024M');
-            // $tag = id3_get_tag( $tag_song , $tag_version);
-            // $tag = id3_get_tag( $tag_song , ID3_BEST);
-        }
-
-    }
-    //Reads ID3v1 from a MP3 file and displays it
-    function get_ID3_v1()
-    {
-        //make a array of genres
-        $genre_arr = array(
-            "Blues","Classic Rock","Country","Dance","Disco","Funk","Grunge",
-        "Hip-Hop","Jazz","Metal","New Age","Oldies","Other","Pop","R&B",
-        "Rap","Reggae","Rock","Techno","Industrial","Alternative","Ska",
-        "Death Metal","Pranks","Soundtrack","Euro-Techno","Ambient",
-        "Trip-Hop","Vocal","Jazz+Funk","Fusion","Trance","Classical",
-        "Instrumental","Acid","House","Game","Sound Clip","Gospel",
-        "Noise","AlternRock","Bass","Soul","Punk","Space","Meditative",
-        "Instrumental Pop","Instrumental Rock","Ethnic","Gothic",
-        "Darkwave","Techno-Industrial","Electronic","Pop-Folk",
-        "Eurodance","Dream","Southern Rock","Comedy","Cult","Gangsta",
-        "Top 40","Christian Rap","Pop/Funk","Jungle","Native American",
-        "Cabaret","New Wave","Psychadelic","Rave","Showtunes","Trailer",
-        "Lo-Fi","Tribal","Acid Punk","Acid Jazz","Polka","Retro",
-        "Musical","Rock & Roll","Hard Rock","Folk","Folk-Rock",
-        "National Folk","Swing","Fast Fusion","Bebob","Latin","Revival",
-        "Celtic","Bluegrass","Avantgarde","Gothic Rock","Progressive Rock",
-        "Psychedelic Rock","Symphonic Rock","Slow Rock","Big Band",
-        "Chorus","Easy Listening","Acoustic","Humour","Speech","Chanson",
-        "Opera","Chamber Music","Sonata","Symphony","Booty Bass","Primus",
-        "Porn Groove","Satire","Slow Jam","Club","Tango","Samba",
-        "Folklore","Ballad","Power Ballad","Rhythmic Soul","Freestyle",
-        "Duet","Punk Rock","Drum Solo","Acapella","Euro-House","Dance Hall"
-        );
-
-        $data = NULL;
-
-        try
-        {
-            $file = fopen($this->song_file, "r");
-            fseek($file, -128, SEEK_END);
-            $raw_tag = fread($file, 128);
-            // debug( 'raw: ' . $raw_tag . PHP_EOL);
-
-            fseek($file, -128, SEEK_END);
-            $tag = fread($file, 3);
-
-            if($tag == "TAG")
-            {
-                $data["song"] = trim(fread($file, 30));
-                $data["artist"] = trim(fread($file, 30));
-                $data["album"] = trim(fread($file, 30));
-                $data["year"] = trim(fread($file, 4));
-                $data["comment"] = trim(fread($file, 30));
-                $data["genre"] = $genre_arr[ord(trim(fread($file, 1)))];
-            }
-            // else
-            // {
-            //     // die("MP3 file does not have any ID3 tag!");
-            // }
-        }
-        catch (Exception $e)
-        {
-            debug( 'Exception caught: ' . $e->getMessage() . "\n");
-        }
-        // finally
-        {
-            fclose($file);
-        }
-
-        // while(list($key, $value) = each($data))
-        // {
-        //     print(" $key: $value\r\n");
-        // }
-        
-        return $data;
-    }
-*/
 }

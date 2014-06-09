@@ -7,5 +7,9 @@ class Configure
     const LYRICS_PATH   = 'lyric/';
     const COVER_PATH    = 'images/cover/';
     const AUDIO_PATH    = 'audio/';
+
+    const HOST          = '127.0.0.1';
+    const USER          = 'developer';
+    const PASSWD        = 'ppp';
     const MEDIA_DB      = 'media';
 }

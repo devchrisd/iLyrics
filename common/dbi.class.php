@@ -16,7 +16,7 @@ Abstract class dbi_class
     public static $db_trace_update = 0x4;
     public static $db_trace_all = 0x6;
 
-    private static $querycounter = 0;
+    protected static $querycounter = 0;
 
     var $connection;
     var $database;
@@ -56,13 +56,13 @@ Abstract class dbi_class
       $this->user   = $user;
       $this->passwd = $passwd;
       $this->host   = $host;
-      $this->database = $db;
+      $this->database   = $db;
+      $this->connection = FALSE;
 
       // the number of times to attempt reconnection
       $this->retry = 1;
 
       $this->debug = false;
-      $this->connection = FALSE;
       $this->trace_buffer = "";
       $this->auto_commit  = $ac;
    }
