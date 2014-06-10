@@ -26,6 +26,8 @@ USAGE:
 
 - Put mp3 files in folder "audio/"
 
+- Album cover is saved in "images/cover"
+
 - Lyrics will be saved in "lyric/"
     - Apache or the webserver user/group must have permission to create/modify file in this folder
     - Lyrics file name has the format of ARTIST_SONG.lrc (with no space)
@@ -34,5 +36,8 @@ USAGE:
 
     - If lyrics is not available locally, it will try to search and download online.
 
+SETUP:
+
 - Build up database with sql script in config/database_setup.sql
+- Run [sitename_iLyrics]/get_mp3?r=1 to scan the audio / lyrics and cover folder to setup database
 

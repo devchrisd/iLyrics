@@ -24,7 +24,7 @@
             <audio id='player' controls playbackrate='1.0' autoplay>
                 <p>Your browser does not support the audio element.</p>
             </audio>
-            <figure><img id='artist_avatar' alt='artist' src='images/dou.jpg' /></figure>
+            <figure><img id='artist_avatar' alt='artist' src='images/default.jpg' /></figure>
         </div>
         <div class='div-list'>
             <h3>

@@ -6,14 +6,16 @@ require_once(dirname(__FILE__) . '/../dbi/mysql_driver.class.php');
 class mp3_lib
 {
     var $mp3_arr;
-    var $media_dbi;
+    static $media_dbi;
 
     function __construct()
     {
         $this->mp3_arr = NULL;
-        $this->media_dbi = NULL;
+        self::$media_dbi = NULL;
+        self::__get_dbi();
     }
 
+    // scan and set file name of songs(including path) into array mp3_arr 
     function _scan_mp3($dir = Configure::AUDIO_PATH)
     {
         $files = null;
@@ -59,48 +61,114 @@ class mp3_lib
     } 
     */
 
+    function __get_dbi()
+    {
+        if (self::$media_dbi === NULL)
+        {
+            self::$media_dbi = new mysql_interface_class(Configure::HOST, Configure::USER, Configure::PASSWD, Configure::MEDIA_DB);
+        }
+    }
+
     function refresh_DB()
     {
+        // scan media folder and put them into mp3_arr
         $this->_scan_mp3();
 
         if ($this->mp3_arr === NULL)
             return;
 
-        if ($this->media_dbi === NULL)
-        {
-            $this->media_dbi = new mysql_interface_class(Configure::HOST, Configure::USER, Configure::PASSWD, Configure::MEDIA_DB);
-        }
+        self::__get_dbi();
+
+        // save each file info into database
         foreach ($this->mp3_arr as $key => $value)
         {
+            //$iLyrics = new ilyrics(basename($value));
+            $title = $artist = $album = $year = $genre = '';
+            // get id3
+            $id3 = $this->get_ID3($value);
+            if ($id3 !== NULL)
+            {
+                $title  = isset($id3['title'])  ? $id3['title'] : '';
+                $artist = isset($id3['artist']) ? $id3['artist']: '';
+                $album  = isset($id3['album'])  ? $id3['album'] : '';
+                $year   = isset($id3['year'])   ? $id3['year']  : '';
+                $genre  = isset($id3['genre'])  ? $id3['genre'] : '';
+
+                $_title  = preg_replace('/\s+/', '', $title);
+                $_artist = preg_replace('/\s+/', '', $artist);
+                $_album  = preg_replace('/\s+/', '', $album);
+                $lyrics_file = Configure::LYRICS_PATH . $_artist . '_' . $_title . '.lrc';
+                if (file_exists($lyrics_file) === FALSE)
+                {
+                    $lyrics_file = NULL;
+                }
+                $cover_file = Configure::COVER_PATH . $_artist . '_' . $_album . '.jpg';
+                if (file_exists($cover_file) === FALSE)
+                {
+                    $cover_file = NULL;
+                }
+            }
+
             $query = 'REPLACE INTO ' . Configure::MEDIA_DB . '.song'
-                    . " SET song_file='" . $this->media_dbi->escape_string($value) . "'"
+                    . " SET song_file='" . self::$media_dbi->escape_string($value) . "',"
+                    . " title='" . self::$media_dbi->escape_string($title) . "',"
+                    . " artist='" . self::$media_dbi->escape_string($artist) . "',"
+                    . " album='" . self::$media_dbi->escape_string($album) . "',"
+                    . " year='" . self::$media_dbi->escape_string($year) . "',"
+                    . " genre='" . self::$media_dbi->escape_string($genre) . "'"
                     ;
-            $this->media_dbi->insert($query);
+            if ($lyrics_file !== NULL)
+            {
+                $query .= ", lyrics_file='" . self::$media_dbi->escape_string($lyrics_file) . "'";
+            }
+            if ($cover_file !== NULL)
+            {
+                $query .= ", cover_file='" . self::$media_dbi->escape_string($cover_file) . "'";
+            }
+            self::$media_dbi->insert($query);
         }
     }
 
+    // get media list from database
     function get_list_from_DB()
     {
         $list = NULL;
-        if ($this->media_dbi === NULL)
-        {
-            $this->media_dbi = new mysql_interface_class(Configure::HOST, Configure::USER, Configure::PASSWD, Configure::MEDIA_DB);
-        }
+        $index = 0;
+        self::__get_dbi();
 
-        if ($this->media_dbi->connect())
+        if (self::$media_dbi->connect())
         {
-            // $this->media_dbi->select_db(Configure::MEDIA_DB);
-            $query = 'SELECT song_file from ' . Configure::MEDIA_DB . '.song;';
-            if ($result = $this->media_dbi->select($query) )
+            // self::$media_dbi->select_db(Configure::MEDIA_DB);
+            $query = 'SELECT s_id, song_file from ' . Configure::MEDIA_DB . '.song;';
+            if ($result = self::$media_dbi->select($query) )
             {
-                while( $row = $this->media_dbi->fetch_row_assoc($result))
+                while( $row = self::$media_dbi->fetch_row_assoc($result))
                 {
-                    $list[] = $row['song_file'];
+                    $list[$index]['s_id'] = $row['s_id'];
+                    $list[$index++]['file'] = $row['song_file'];
                 }
             }
         }
-
         return $list;
+    }
+
+    function get_song_info($s_id)
+    {
+        self::__get_dbi();
+
+        if (self::$media_dbi->connect())
+        {
+            // self::$media_dbi->select_db(Configure::MEDIA_DB);
+            $query = 'select * from ' . Configure::MEDIA_DB . '.song WHERE s_id="' . $s_id .'"';
+            if ($result = self::$media_dbi->select($query) )
+            {
+                if ( $row = self::$media_dbi->fetch_row_assoc($result))
+                {
+                    return $row;
+                }
+            }
+        }
+        return NULL;
     }
 
     public function get_ID3($song_file)
@@ -121,24 +189,63 @@ class mp3_lib
         {
             // debug(print_r($ThisFileInfo['comments'],1));
 
-            $id3['song'] = $ThisFileInfo['comments']['title'][0];
-            $id3['artist'] = $ThisFileInfo['comments']['artist'][0];
-            $id3['album'] = $ThisFileInfo['comments']['album'][0];
-            $id3['year'] = $ThisFileInfo['comments']['year'][0];
-            $id3['genre'] = $ThisFileInfo['comments']['genre'][0];
+            $id3['title']  = isset($ThisFileInfo['comments']['title'][0])  ? $ThisFileInfo['comments']['title'][0]  : '';
+            $id3['artist'] = isset($ThisFileInfo['comments']['artist'][0]) ? $ThisFileInfo['comments']['artist'][0] : '';
+            $id3['album']  = isset($ThisFileInfo['comments']['album'][0])  ? $ThisFileInfo['comments']['album'][0]  : '';
+            $id3['year']   = isset($ThisFileInfo['comments']['year'][0])   ? $ThisFileInfo['comments']['year'][0]   : '';
+            $id3['genre']  = isset($ThisFileInfo['comments']['genre'][0])  ? $ThisFileInfo['comments']['genre'][0]  : '';
             if (isset($ThisFileInfo['comments']['unsynchronised_lyric']))
                 $id3['unsynchronised_lyric'] = $ThisFileInfo['comments']['unsynchronised_lyric'][0];
         }
 
-        if (!isset($id3['song']) || empty($id3['song']))
+        if (!isset($id3['title']) || empty($id3['title']))
         {
             $filename = basename($song_file);
-            $id3['song'] = substr($filename, 0, strrpos($filename, '.'));
+            $id3['title'] = substr($filename, 0, strrpos($filename, '.'));
         }
 
         return $id3;
     }
 
+    function update_record($s_id, $data, $field)
+    {
+        self::__get_dbi();
+
+        $query = '';
+        switch ($field)
+        {
+            case Configure::FIELD_COVER:
+                $query = 'UPDATE ' . Configure::MEDIA_DB . '.song set cover_file="' . self::$media_dbi->escape_string($data) . '" WHERE s_id=' . self::$media_dbi->escape_string($s_id);
+                break;
+            case Configure::FIELD_LYRICS:
+                $query = 'UPDATE ' . Configure::MEDIA_DB . '.song set lyrics_file="' . self::$media_dbi->escape_string($file) . '" WHERE s_id=' . self::$media_dbi->escape_string($s_id);
+                break;
+            default:
+                break;
+        }
+        if (empty($query) === FALSE)
+        {
+            // update database
+            self::$media_dbi->update($query);
+        }
+    }
+
+    function get_cover($file)
+    {
+        if ($file)
+        {
+            self::__get_dbi();
+            $query = 'select cover_file from ' . Configure::MEDIA_DB . '.song where song_file="' . self::$media_dbi->escape_string($file) . '"';
+            if ($result = self::$media_dbi->select($query) )
+            {
+                if ( $row = self::$media_dbi->fetch_row_assoc($result))
+                {
+                    return $row['cover_file'];
+                }
+            }
+        }
+        return NULL;
+    }
 /*
     function get_ID3_old()
     {

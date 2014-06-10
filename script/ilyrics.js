@@ -30,8 +30,8 @@ $(function()
     $(document).on('click', '.add_song', function(){
         // add to playlist
         $('#playlist').append(
-                                "<li><span class='play_song'>" + 
-                                $(this).text() + 
+                                "<li><span class='play_song' s_id='" + $(this).attr('s_id') + "' " + 
+                                "path='" + $(this).attr('path') + "'>" + $(this).text() + 
                                 "</span><img class='remove' alt='X' /></li>"
                             );
     });
@@ -62,15 +62,17 @@ $(function()
         $(this).addClass('current_song');
 
         ele_song.empty()
-                .attr('src', $(this).text())
+                .attr('src', $(this).attr('path') + '/' + $(this).text())
+                .attr('s_id', $(this).attr('s_id'))
                 .appendTo(ele_song);
 
         getLyrics();
+        getCover();
     });
 
     $(document).on('click', '.tag', function(){
         // pop up id3 info
-        var url = "get_id3.php?id=" + $(this).parent().text();
+        var url = "get_id3.php?id=" + $(this).parent().attr('s_id');
 
         // get id3 in json
         $.getJSON(url, function (id3)
@@ -135,12 +137,20 @@ function getMp3 ()
         if (mp3)
         {
             $.each(mp3, function(i, val){
-                $('#filelist').append("<li class='add_song' id='" + i + "'>" + val + "<img class='tag' alt='Tag' /></li>");
+                var pos = val.file.lastIndexOf("/");
+                // var url = "get_lyrics.php?id=" + ele_song.attr('src').substring(pos+1);
+
+                path = val.file.substr(0, pos);
+                file = val.file.substr(pos+1);
+
+                $('#filelist').append("<li class='add_song' s_id='" + val.s_id + "'" + 
+                    "path='" + path + "''>" + file + "<img class='tag' alt='Tag' /></li>");
             });
 
             // load first song
             ele_song.empty()
-                    .attr('src', mp3[0])
+                    .attr('src', mp3[0]['file'])
+                    .attr('s_id', mp3[0]['s_id'])
                     .appendTo(ele_song);
 
             // add first song to playlist
@@ -155,9 +165,11 @@ function getMp3 ()
 // Get lyrics from server
 function getLyrics ()
 {
-    var pos = ele_song.attr('src').lastIndexOf("/");
+    // var pos = ele_song.attr('src').lastIndexOf("/");
     // attach song_file name to the query
-    var url = "get_lyrics.php?id=" + ele_song.attr('src').substring(pos+1);
+    // var url = "get_lyrics.php?id=" + ele_song.attr('src').substring(pos+1);
+    var url = "get_lyrics.php?id=" + ele_song.attr('s_id');
+
     log('url', url);
 
     // get lyrics in json
@@ -209,6 +221,31 @@ function setLyrics(lyrics)
     ele_lyrics.html(lyrics);
 }
 
+function getCover()
+{
+    // var pos = ele_song.attr('src').lastIndexOf("/");
+    // attach song_file name to the query
+    // var url = "get_lyrics.php?id=" + ele_song.attr('src').substring(pos+1);
+    var url = "get_cover.php?id=" + ele_song.attr('s_id');
+
+    // get lyrics in json
+    $.getJSON(url, function (json)
+    {
+        // log('result :', json);
+
+        if (json && json.length > 0)
+        {
+            // show cover
+            $('#artist_avatar').attr('src', json);
+        }
+        else
+        {
+            // replace with default
+            $('#artist_avatar').attr('src', 'images/default.jpg');
+        }
+    });
+    return;
+}
 function log()
 {
     //    var debug = false;

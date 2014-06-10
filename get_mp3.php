@@ -3,14 +3,14 @@
 require_once('lib/common.php');
 require_once('lib/audio/mp3_lib.class.php');
 
-$mp3 = $mp3_list = NULL;
+$mp3_list = NULL;
 
 $mp3_lib = new mp3_lib();
 
 // scan library and save to DB
 if (isset($_GET['r']) === true && empty($_GET['r']) !== true)
 {
-    $mp3_lib->refresh_DB($mp3);
+    $mp3_lib->refresh_DB();
 }
 
 // Get list from DB

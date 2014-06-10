@@ -12,4 +12,7 @@ class Configure
     const USER          = 'developer';
     const PASSWD        = 'ppp';
     const MEDIA_DB      = 'media';
+
+    const FIELD_LYRICS   = 'lyrics_file';
+    const FIELD_COVER    = 'cover_file';
 }
