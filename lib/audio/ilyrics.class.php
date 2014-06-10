@@ -1,7 +1,7 @@
 <?php
-require_once('configure.class.php');
-require_once('common.php');
-require_once('curl.class.php');
+require_once(dirname(__FILE__) . '/../configure.class.php');
+require_once(dirname(__FILE__) . '/../common.php');
+require_once(dirname(__FILE__) . '/../curl.class.php');
 require_once('mp3_lib.class.php');
 
     /*

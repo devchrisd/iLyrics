@@ -4,7 +4,7 @@
     else
         exit;
 
-    require_once('common/ilyrics.class.php');
+    require_once('lib/audio/ilyrics.class.php');
 
     $ly = '';
     $iLyrics = new ilyrics($filename);

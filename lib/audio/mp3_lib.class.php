@@ -1,7 +1,7 @@
 <?php
 
-require_once('getid3/getid3.php');
-require_once('mysql_driver.class.php');
+require_once(dirname(__FILE__) . '/../getid3/getid3.php');
+require_once(dirname(__FILE__) . '/../dbi/mysql_driver.class.php');
 
 class mp3_lib
 {

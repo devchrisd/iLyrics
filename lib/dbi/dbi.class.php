@@ -1,6 +1,6 @@
 <?php
 
-require_once('common/common.php');
+require_once(dirname(__FILE__) . '/../common.php');
 
 // Lets log queries that are slow.
 define('SLOW_QUERY_THRESHOLD', 3);

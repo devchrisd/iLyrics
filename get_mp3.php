@@ -1,7 +1,7 @@
 <?php
 
-require_once('common/common.php');
-require_once('common/mp3_lib.class.php');
+require_once('lib/common.php');
+require_once('lib/audio/mp3_lib.class.php');
 
 $mp3 = $mp3_list = NULL;
 
