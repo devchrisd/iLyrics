@@ -65,6 +65,7 @@ class mp3_lib
     {
         if (self::$media_dbi === NULL)
         {
+            // debug(print_r(debug_backtrace(),1));
             self::$media_dbi = new mysql_interface_class(Configure::HOST, Configure::USER, Configure::PASSWD, Configure::MEDIA_DB);
         }
     }
@@ -210,7 +211,6 @@ class mp3_lib
     function update_record($s_id, $data, $field)
     {
         self::__get_dbi();
-
         $query = '';
         switch ($field)
         {
@@ -218,7 +218,7 @@ class mp3_lib
                 $query = 'UPDATE ' . Configure::MEDIA_DB . '.song set cover_file="' . self::$media_dbi->escape_string($data) . '" WHERE s_id=' . self::$media_dbi->escape_string($s_id);
                 break;
             case Configure::FIELD_LYRICS:
-                $query = 'UPDATE ' . Configure::MEDIA_DB . '.song set lyrics_file="' . self::$media_dbi->escape_string($file) . '" WHERE s_id=' . self::$media_dbi->escape_string($s_id);
+                $query = 'UPDATE ' . Configure::MEDIA_DB . '.song set lyrics_file="' . self::$media_dbi->escape_string($data) . '" WHERE s_id=' . self::$media_dbi->escape_string($s_id);
                 break;
             default:
                 break;

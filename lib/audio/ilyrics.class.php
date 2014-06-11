@@ -95,6 +95,7 @@ $id3["comment"];
     {
         // $this->media_dbi = NULL;//new mysql_interface_class(Configure::HOST, Configure::USER, Configure::PASSWD, Configure::MEDIA_DB);
 
+        $this->s_id = $s_id;
         // Get song info from DB
         $this->song_info    = mp3_lib::get_song_info($s_id);
 
