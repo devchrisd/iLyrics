@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `song` (
   `song_file` varchar(250) NOT NULL DEFAULT '',
   `title` varchar(128) NOT NULL DEFAULT '',
   `album` varchar(128) NOT NULL DEFAULT '',
-  `artist` varchar(80) NOT NULL DEFAULT '',
+  `artist` varchar(128) NOT NULL DEFAULT '',
   `year` varchar(18) NOT NULL DEFAULT '',
   `genre` varchar(60) NOT NULL DEFAULT '',
   `lyrics_file` varchar(256) NOT NULL DEFAULT '',

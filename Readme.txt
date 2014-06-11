@@ -29,15 +29,21 @@ USAGE:
 - Album cover is saved in "images/cover"
 
 - Lyrics will be saved in "lyric/"
-    - Apache or the webserver user/group must have permission to create/modify file in this folder
     - Lyrics file name has the format of ARTIST_SONG.lrc (with no space)
         If this file is not availble, it will try the name SONG.lrc. 
         If this name SONG.lrc is available, and artist name is known, it will rename SONG.lrc to ARTIST_SONG.lrc.
 
     - If lyrics is not available locally, it will try to search and download online.
 
+- Apache or the webserver user/group must have permission to create/modify file in lyric/ and image/cover
+
 SETUP:
 
 - Build up database with sql script in config/database_setup.sql
+- create user 'developer' in mysql:
+	mysql> create user 'developer'@'localhost' identified by 'ppp';
+	mysql> grant all on media.* to 'developer'@'localhost';
+	mysql> flush privileges;
+
 - Run [sitename_iLyrics]/get_mp3?r=1 to scan the audio / lyrics and cover folder to setup database
 

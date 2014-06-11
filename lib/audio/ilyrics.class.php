@@ -86,6 +86,7 @@ $id3["comment"];
 */
     private $song_file;
     private $lyrics_files;
+    private $s_id;
     // private $media_dbi;
 
 
