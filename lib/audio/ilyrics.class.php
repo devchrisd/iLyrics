@@ -63,6 +63,14 @@ require_once('mp3_lib.class.php');
                 "thumb": "http://s.geci.me/album-cover/328/3288629-thumb.jpg"
                 }
         }
+
+$id3["title"];
+$id3["artist"];
+$id3["album"];
+$id3["year"];
+$id3["genre"];
+$id3["comment"];
+
     */
 class ilyrics
 {
@@ -73,17 +81,9 @@ class ilyrics
     const AUDIO_PATH    = Configure::AUDIO_PATH;
     const MEDIA_DB      = Configure::MEDIA_DB;
 
-    public $id3;
     public $lyrics;
     public $cover_file;
-/*
-$id3["title"];
-$id3["artist"];
-$id3["album"];
-$id3["year"];
-$id3["genre"];
-$id3["comment"];
-*/
+
     private $song_file;
     private $lyrics_files;
     private $s_id;
@@ -95,7 +95,6 @@ $id3["comment"];
     {
         // $this->media_dbi = NULL;//new mysql_interface_class(Configure::HOST, Configure::USER, Configure::PASSWD, Configure::MEDIA_DB);
 
-        $this->s_id = $s_id;
         // Get song info from DB
         $this->song_info    = mp3_lib::get_song_info($s_id);
 
@@ -108,10 +107,11 @@ $id3["comment"];
             return FALSE;
         }
 
+        $this->s_id       = $s_id;
         $this->cover_file = $this->lyrics_files = NULL;
+        $this->lyrics     = '';
 
         $this->song_file = $this->song_info['song_file'];
-        $this->id3       = $this->get_ID3();
 
         if (
             isset($this->song_info['lyrics_file']) === TRUE &&
@@ -126,19 +126,17 @@ $id3["comment"];
             empty($this->song_info['cover_file']) === FALSE
             )
         {
-            $this->cover_file = array($this->song_info['cover_file']);
+            $this->cover_file = $this->song_info['cover_file'];
         }
 
         if (
-            $this->id3 !== NULL &&
-                (
                 $this->lyrics_files === NULL || 
                 $this->cover_file === NULL
-                )
             )
         {
-            $title  = $this->id3['title'];
-            $artist = $this->id3['artist'];
+            debug(__METHOD__ . ' song_info for ' . $this->song_file . ':' . print_r($this->song_info,1));
+            $title  = $this->song_info['title'];
+            $artist = $this->song_info['artist'];
 
             $_title  = preg_replace('/\s+/', '', $title);
             $_artist = preg_replace('/\s+/', '', $artist);
@@ -154,29 +152,23 @@ $id3["comment"];
 
             if ($this->cover_file === NULL)
             {
-                $album = $this->id3['album'];
+                $album = $this->song_info['album'];
                 $_album = preg_replace('/\s+/', '', $album);
                 $this->cover_file = self::COVER_PATH . $_artist . '_' . $_album;
             }
         }
 
-
-        $this->lyrics       = '';
-
-        debug(__METHOD__ . ' ID3 for ' . $this->song_file . ':' . print_r($this->id3,1));
-        $this->filename     = basename($this->song_file);
+        $this->filename       = basename($this->song_file);
         $this->lyrics_files[] = self::LYRICS_PATH . substr($this->filename, 0, strrpos($this->filename, '.')) . '.lrc';
-    }
-
-    function get_ID3()
-    {
-        return mp3_lib::get_ID3($this->song_file);
     }
 
     function get_cover()
     {
         // get album cover
-        return mp3_lib::get_cover($this->song_file);
+        if (empty($this->song_info['cover_file']) === FALSE)
+            return $this->song_info['cover_file'];
+
+        return mp3_lib::get_cover($this->s_id);
     }
 
     function fetch()
@@ -185,7 +177,7 @@ $id3["comment"];
         if ($result !== FALSE)
         {
             debug( "get file " . $this->lyrics_files[0]);
-            $this->fetch_lyrics_from_DB();
+            $this->__fetch_lyric();
         }
         else
         {
@@ -228,18 +220,14 @@ $id3["comment"];
         return FALSE;
     }
 
-    function fetch_lyrics_from_DB()
+    function __fetch_lyric()
     {
-        $this->__fetch_lyric($this->lyrics_files[0]);
-    }
-
-    function __fetch_lyric($lyrics_file)
-    {
-        $this->lyrics = file_get_contents($lyrics_file);
+        $this->lyrics = file_get_contents($this->lyrics_files[0]);
     }
 
     function __save_file($file, $contents, $type='')
     {
+        $ret = FALSE;
         // if (file_exists($file)) return TRUE;
 
         try
@@ -251,13 +239,30 @@ $id3["comment"];
 
             if (empty($type) === FALSE)
             {
-                mp3_lib::update_record($this->s_id, $file, $type);
+                $ret = mp3_lib::update_record($this->s_id, $file, $type);
+
+                if ($ret === FALSE) return FALSE;
+
+                // update song_info
+                switch ($type)
+                {
+                    case Configure::FIELD_COVER:
+                        $this->song_info['cover_file'] = $file;
+                        break;
+                    case Configure::FIELD_LYRICS:
+                        $this->song_info['lyrics_file'] = $file;
+                        break;
+                    default:
+                        break;
+                }
             }
         }
         catch(Exception $e)
         {
-            debug( 'Exception caught: ' . $e->getMessage() . "\n");
+            debug( __METHOD__ . ' Exception caught: ' . $e->getMessage() . "\n");
         }
+
+        return $ret;
     }
 
     function fetch_lyrics_online()
@@ -266,9 +271,9 @@ $id3["comment"];
 
         $url = self::SEARCH_URL . self::LYRICS_PATH
                  . substr($this->filename, 0, strrpos($this->filename, '.'));
-        if ($this->id3 !== NULL)
+        if ($this->song_info !== NULL)
         {
-            $url = self::SEARCH_URL . self::LYRICS_PATH . $this->id3['title'] . '/' . $this->id3['artist'];
+            $url = self::SEARCH_URL . self::LYRICS_PATH . $this->song_info['title'] . '/' . $this->song_info['artist'];
         }
 
         try {
@@ -297,11 +302,11 @@ $id3["comment"];
                     foreach ($result_arr['result'] as $key => $lrc_arr)
                     {
                         $count++;
-                        if (isset($lrc_arr['lrc']) === TRUE && !empty($lrc_arr['lrc']))
+                        if (isset($lrc_arr['lrc']) === TRUE && empty($lrc_arr['lrc']) === FALSE)
                         {
                             $lyrics_url = $lrc_arr['lrc'];
 
-                            debug(__METHOD__ . ' lyrics_url: ' . $lyrics_url);
+                            // debug(__METHOD__ . ' lyrics_url: ' . $lyrics_url);
 
                             $curl->set_para($lyrics_url);
                             $this->lyrics = $curl->send_request();
@@ -312,39 +317,35 @@ $id3["comment"];
                                 debug(__METHOD__ . " :$count: online Lyrics Got " . $response_header['http_code'] . ' ! ! ! ');
                             }
 
-                            if ($this->lyrics !== '')
+                            // get cover:         http://geci.me/api/cover/AlbumId
+                            if (
+                                    (
+                                        isset($this->song_info['cover_file']) === FALSE ||
+                                        empty($this->song_info['cover_file']) === TRUE 
+                                    )
+                                    &&
+                                    isset($lrc_arr['aid']) === TRUE
+                                )
                             {
-                                debug(__METHOD__ . " :$count: Save online lyrics to file: " . $this->lyrics_files[0]);
+                                $cover_url = self::SEARCH_URL . 'cover/'. $lrc_arr['aid'];
+                                $curl->set_para($cover_url);
+                                $cover_arr = json_decode($curl->send_request(), TRUE);
 
-                                $this->__save_file($this->lyrics_files[0], $this->lyrics, Configure::FIELD_LYRICS);
+                                debug('get cover file: ' . print_r($cover_arr,1));
 
-                                // get cover:         http://geci.me/api/cover/AlbumId
-                                if (
-                                        (
-                                            isset($this->song_info['cover_file']) === FALSE ||
-                                            empty($this->song_file['cover_file']) === TRUE 
-                                        ) 
-                                        &&
-                                        isset($lrc_arr['aid']) === TRUE
+                                if (isset($cover_arr['result']['thumb']) === TRUE &&
+                                    empty($cover_arr['result']['thumb']) === FALSE
                                     )
                                 {
-                                    $cover_url = self::SEARCH_URL . 'cover/'. $lrc_arr['aid'];
-                                    $curl->set_para($cover_url);
-                                    $cover_arr = json_decode($curl->send_request(), TRUE);
-
-                                    debug('get cover file: ' . print_r($cover_arr,1));
-
-                                    if (isset($cover_arr['result']['thumb']) === TRUE &&
-                                        empty($cover_arr['result']['thumb']) === FALSE
-                                        )
-                                    {
-                                        $imagefile = $cover_arr['result']['thumb'];
-                                        debug(' image file: ' .$imagefile);
-                                        $this->cover_file .= '.' . substr($imagefile, strrpos($imagefile, '.')+1);
-                                        debug('save cover file: ' . $this->cover_file);
-                                        $this->__save_file($this->cover_file, file_get_contents($imagefile), Configure::FIELD_COVER);
-                                    }
+                                    $imagefile = $cover_arr['result']['thumb'];
+                                    $this->cover_file .= '.' . substr($imagefile, strrpos($imagefile, '.')+1);
+                                    $this->__save_file($this->cover_file, file_get_contents($imagefile), Configure::FIELD_COVER);
                                 }
+                            }
+
+                            if ($this->lyrics !== '')
+                            {
+                                $this->__save_file($this->lyrics_files[0], $this->lyrics, Configure::FIELD_LYRICS);
                                 break;
                             }
                         }

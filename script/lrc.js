@@ -53,7 +53,6 @@ var lrc = {
                 // this.index is the max value from this.processData
                 this.lytext[this.index] = '';
                 this.lytime[this.index] = this.lytime[this.index-1] + 5;
-
                 if (this.islrc === true) this.scrollBar();
                 this.setLyricsPlayTimeOut();
             }
@@ -69,8 +68,9 @@ var lrc = {
             return;
         }
 
-        this.scrollh = this.currentLine * 25; // amount to scroll top. line-height:25px;
-
+        line_height = this.elementLyrics.css('line-height');
+        line_height = parseInt(line_height.substring(0, line_height.lastIndexOf('p')));
+        this.scrollh = this.currentLine * (line_height+1); // amount to scroll top. line-height:25px;
         if (this.elementLyrics.scrollTop() <= this.scrollh)
         {
             position = this.elementLyrics.scrollTop() + 1;

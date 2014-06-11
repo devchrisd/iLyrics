@@ -66,8 +66,7 @@ $(function()
                 .attr('s_id', $(this).attr('s_id'))
                 .appendTo(ele_song);
 
-        getLyrics();
-        getCover();
+        getLyrics($(this).attr('s_id'));
     });
 
     $(document).on('click', '.tag', function(){
@@ -147,13 +146,14 @@ function getMp3 ()
                     "path='" + path + "''>" + file + "<img class='tag' alt='Tag' /></li>");
             });
 
-            // load first song
+            // default initial action:
+            // - load first song
             ele_song.empty()
                     .attr('src', mp3[0]['file'])
                     .attr('s_id', mp3[0]['s_id'])
                     .appendTo(ele_song);
 
-            // add first song to playlist
+            // - add first song to playlist
             $('#filelist>li:first').trigger( "click" );
             $('.play_song:first()').trigger('click');
         }
@@ -163,12 +163,12 @@ function getMp3 ()
 }
 
 // Get lyrics from server
-function getLyrics ()
+function getLyrics (s_id)
 {
     // var pos = ele_song.attr('src').lastIndexOf("/");
     // attach song_file name to the query
     // var url = "get_lyrics.php?id=" + ele_song.attr('src').substring(pos+1);
-    var url = "get_lyrics.php?id=" + ele_song.attr('s_id');
+    var url = "get_lyrics.php?id=" + s_id;
 
     log('url', url);
 
@@ -177,10 +177,11 @@ function getLyrics ()
     {
         // log('result :', json);
 
-        if (json && json.length > 0)
+        if (json)
         {
+            setCover(json.cover);
             // show lyrics
-            lrc.start(ele_song, ele_lyrics, json);
+            lrc.start(ele_song, ele_lyrics, json.lyrics);
         }
         else
         {
@@ -221,12 +222,25 @@ function setLyrics(lyrics)
     ele_lyrics.html(lyrics);
 }
 
-function getCover()
+function setCover(cover)
+{
+    if (cover && cover.length > 0)
+    {
+        // show cover
+        $('#artist_avatar').attr('src', cover);
+    }
+    else
+    {
+        // replace with default
+        $('#artist_avatar').attr('src', 'images/default.jpg');
+    }
+}
+function getCover(s_id)
 {
     // var pos = ele_song.attr('src').lastIndexOf("/");
     // attach song_file name to the query
     // var url = "get_lyrics.php?id=" + ele_song.attr('src').substring(pos+1);
-    var url = "get_cover.php?id=" + ele_song.attr('s_id');
+    var url = "get_cover.php?id=" + s_id;
 
     // get lyrics in json
     $.getJSON(url, function (json)

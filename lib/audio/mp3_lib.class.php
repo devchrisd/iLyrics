@@ -210,12 +210,26 @@ class mp3_lib
 
     function update_record($s_id, $data, $field)
     {
+        $ret = FALSE;
+
         self::__get_dbi();
         $query = '';
         switch ($field)
         {
             case Configure::FIELD_COVER:
-                $query = 'UPDATE ' . Configure::MEDIA_DB . '.song set cover_file="' . self::$media_dbi->escape_string($data) . '" WHERE s_id=' . self::$media_dbi->escape_string($s_id);
+                // update all records of (album, artist)
+                // 
+                $query_select = 'SELECT album, artist FROM ' . Configure::MEDIA_DB . '.song WHERE s_id="' . self::$media_dbi->escape_string($s_id) . '"';
+                if ($result_select = self::$media_dbi->select($query_select) )
+                {
+                    if ( $row_select = self::$media_dbi->fetch_row_assoc($result_select))
+                    {
+                        $album  = $row_select['album'];
+                        $artist = $row_select['artist'];
+                    }
+                }
+
+                $query = 'UPDATE ' . Configure::MEDIA_DB . '.song set cover_file="' . self::$media_dbi->escape_string($data) . '" WHERE album="' . self::$media_dbi->escape_string($album) . '" AND artist="' .  self::$media_dbi->escape_string($artist) . '"';
                 break;
             case Configure::FIELD_LYRICS:
                 $query = 'UPDATE ' . Configure::MEDIA_DB . '.song set lyrics_file="' . self::$media_dbi->escape_string($data) . '" WHERE s_id=' . self::$media_dbi->escape_string($s_id);
@@ -226,16 +240,19 @@ class mp3_lib
         if (empty($query) === FALSE)
         {
             // update database
-            self::$media_dbi->update($query);
+            $ret = self::$media_dbi->update($query);
         }
+
+        return $ret;
     }
 
-    function get_cover($file)
+    function get_cover($s_id)
     {
-        if ($file)
+        if ($s_id)
         {
             self::__get_dbi();
-            $query = 'select cover_file from ' . Configure::MEDIA_DB . '.song where song_file="' . self::$media_dbi->escape_string($file) . '"';
+            $query = 'SELECT cover_file FROM ' . Configure::MEDIA_DB . '.song WHERE s_id="' . self::$media_dbi->escape_string($s_id) . '"';
+
             if ($result = self::$media_dbi->select($query) )
             {
                 if ( $row = self::$media_dbi->fetch_row_assoc($result))
