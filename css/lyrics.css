@@ -46,12 +46,12 @@ footer h4
     padding: 10px;
 }
 
-#div_player
+#div-player
 {
     display: table;
 }
 
-#div_player figure,
+#div-player figure,
 #player
 {
     display: table-cell;
@@ -92,6 +92,10 @@ footer h4
 .list li
 {
     padding: 5px;
+}
+
+.list span
+{
     cursor:pointer;
 }
 
@@ -119,6 +123,18 @@ footer h4
     cursor:pointer;
     margin: 0;
     float: right;
+}
+
+#div-tag
+{
+    display: none;
+    min-width: 200px;
+    background-color: #eee;
+}
+
+#div-tag li
+{
+    list-style: none;
 }
 
 #loop_status

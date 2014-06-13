@@ -21,7 +21,7 @@
 
     <div id='container'>
     <section class='container-left'>
-        <div id='div_player'>
+        <div id='div-player'>
             <audio id='player' controls playbackrate='1.0' autoplay>
                 <p>Your browser does not support the audio element.</p>
             </audio>
@@ -43,6 +43,13 @@
             </header>
             <ul id='filelist' class='list'>
             </ul>
+            <div id='div-tag'>
+                <ul>
+                    <li>tag content:
+                    </li>
+                </ul>
+
+            </div>
         </div>
     </section>
 
