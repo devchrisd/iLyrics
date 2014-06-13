@@ -140,7 +140,7 @@ class mp3_lib
         if (self::$media_dbi->connect())
         {
             // self::$media_dbi->select_db(Configure::MEDIA_DB);
-            $query = 'SELECT s_id, song_file from ' . Configure::MEDIA_DB . '.song;';
+            $query = 'SELECT s_id, song_file from ' . Configure::MEDIA_DB . '.song order by s_id;';
             if ($result = self::$media_dbi->select($query) )
             {
                 while( $row = self::$media_dbi->fetch_row_assoc($result))

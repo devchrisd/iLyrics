@@ -70,17 +70,17 @@ $(function()
     });
 
     $(document).on('click', '.tag', function(){
-        // pop up id3 info
-        var url = "get_id3.php?id=" + $(this).parent().attr('s_id');
+        // pop up tag info
+        var url = "get_tag.php?id=" + $(this).parent().attr('s_id');
 
-        // get id3 in json
-        $.getJSON(url, function (id3)
+        // get tag in json
+        $.getJSON(url, function (tag)
         {
-            if(id3)
+            if(tag)
             {
-                // show id3
-                $.each(id3, function(key, val){
-                log('got id3: ' + key + ':' + val);
+                // show tag
+                $.each(tag, function(key, val){
+                log('got tag: ' + key + ':' + val);
 
                 //$('#filelist').append("<li class='add_song' id='" + i + "'>" + val + "<img class='tag' alt='Tag' /></li>");
             });

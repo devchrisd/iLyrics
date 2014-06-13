@@ -14,11 +14,12 @@
 </head>
 
 <body>
-<div class='container'>
-    <header>
+<div class='main'>
+    <header class='top'>
         <h1>iLyrics</h1>
     </header>
 
+    <div id='container'>
     <section class='container-left'>
         <div id='div_player'>
             <audio id='player' controls playbackrate='1.0' autoplay>
@@ -27,28 +28,31 @@
             <figure><img id='artist_avatar' alt='artist' src='' /></figure>
         </div>
         <div class='div-list'>
-            <h3>
-                Playlist
+            <header>
+                <h3>Playlist
                 <img class='loop' alt='O' src='images/loop-square_25.jpg' />
                 <span id='loop_status'></span>
-            </h3>
+                </h3>
+            </header>
             <ul id='playlist' class='list'>
+            </ul>
+        </div>
+        <div class='div-list'>
+            <header>
+                <h3>Library</h3>
+            </header>
+            <ul id='filelist' class='list'>
             </ul>
         </div>
     </section>
 
     <section class='container-right'>
         <div id='lyrics'>Fetching lyrics ...</div> 
-        <div class='div-list'>
-            <h3>Library</h3>
-            <ul id='filelist' class='list'>
-
-            </ul>
-        </div>
     </section>
+    </div>
 
     <footer>
-        2014 <a href='mailto:devchrisd@gmail.com'>Chris Ding</a>
+        <h4>2014 <a href='mailto:devchrisd@gmail.com'>Chris Ding</a></h4>
     </footer>
 </div>
 </body>

@@ -20,14 +20,14 @@ var lrc = {
 
     reset: function()
     {
-        this.init   = true;
-        this.offset = 0;
-        this.index  = 0;
-        this.lytext = new Array();// lyrics text
-        this.lytime = new Array();// lyrics time
-        this.currentLine    = 0;
-        this.scrollh = 0;
-        this.islrc     = true;
+        this.init       = true;
+        this.offset     = 0;
+        this.index      = 0;
+        this.lytext     = new Array();// lyrics text
+        this.lytime     = new Array();// lyrics time
+        this.currentLine= 0;
+        this.scrollh    = 0;
+        this.islrc      = true;
 
         // clear timer so it won't replace messages in lyrics block
         if (this.lyricsPlayTimeout !== null)
@@ -282,7 +282,7 @@ var lrc = {
             else
             {
                 // normal lines
-                this.elementLyrics.append(this.lytext[k]+"<br>");
+                this.elementLyrics.append("<span>" + this.lytext[k]+"</span><br>");
             }
         }
 

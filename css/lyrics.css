@@ -1,74 +1,101 @@
 body
 {
     width: 800px;
+    margin: 10px;
 }
 
-header
+header.top
 {
     width:100%;
     height:60px;
-    border-radius:5px;
+    border-radius:10px;
     background:#636363;
-    border:1px solid #cccccc;
-    position:absolute;
+    margin-bottom: 20px;
 }
 
 .container
 {
-    clear: both;
-    margin: 0 auto;
+    display: table;
     width: 100%;
 }
 
 .container-left
 {
-    background: #aaa;
     width: 350px;
+    display: table-cell;
+    background: #aaa;
     /*height: 100%;*/
-    border-radius: 5px;
 }
 
 .container-right
 {
+    width: 98%;
+    display: table-cell;
     background: #aaa;
+}
+
+footer{
+    width: 100%;
+    height:35px;
+    margin: 10px auto;
+    background-color: #aaa;
+}
+
+footer h4
+{
+    padding: 10px;
+}
+
+#div_player
+{
+    display: table;
+}
+
+#div_player figure,
+#player
+{
+    display: table-cell;
+}
+
+#player{
+    height: 74px;
+}
+#artist_avatar
+{
+    margin: 0;
+    padding: 0;
 }
 
 .div-list
 {
+    width:100%;
     border: 1px solid #333;
-    margin: 0px;
+    margin: 0;
 }
 
 .list
 {
     padding-left: 5px;
     background: #ccc;
-    margin: 0px;
+    margin: 0;
 
     height:100px;
     overflow-y:scroll;
     text-align:left;
 }
 
-.list > ul > li
+.list li:nth-child(odd)
 {
+    background-color: #999;
+}
+
+.list li
+{
+    padding: 5px;
     cursor:pointer;
 }
 
-figure
-{
-    margin: 0;
-    padding: 0;
-}
-
-#artist_avatar
-{
-    margin: 0;
-    padding: 0;
-    /*float: right;*/
-}
-
-.current_song
+.current_song, .current_line
 {
     color:blue;
     font-weight:bold;
@@ -81,16 +108,10 @@ figure
     text-align:left;
     font-size:13px;
 
-    margin: 0px;
+    margin-top: 10px;
     padding-top:50px;
     padding-left:20px;
     padding-bottom:50px;
-}
-
-.current_line
-{
-    color:blue;
-    font-weight:bold;
 }
 
 .tag, .remove, .loop
