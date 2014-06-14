@@ -93,7 +93,8 @@ log('tag pos: ' + pos_str + ', show in pos: ' + pos1_str);
             if(tag)
             {
                 var tag_arr = ['title', 'artist', 'album', 'year', 'genre'];
-                $('#div-tag').html('<ul></ul>');
+                $('#div-tag').attr('s_id', tag['s_id']);
+                $('#div-tag ul').html('');
                 // show tag
                 $.each(tag, function(key, val){
                     if ($.inArray(key, tag_arr) >= 0)
