@@ -1,11 +1,11 @@
 /* General styles */
-*   {margin:10; padding:0; }
+*   {margin:0; padding:0; }
 
-img {border:0px; }
+img {border:0; }
 
 body {
     height:100%;
-    font:12px Arial;
+    font: 12px Helvetica, Arial, sans-serif;
     text-align: left;
     background: #F5F4EF url('../images/bg.png');
     }
@@ -17,25 +17,26 @@ html>body div, html>body div *
     position:static;  /* good browsers */
 }
 
-footer{
-    width: 100%;
-    padding: 10px;
-    background-color: #aaa;
+header
+{
+    border:1px solid #cccccc;
+    position:absolute;
 }
+
 
 /* Headings */
 h1 {
     font:bold 25px Verdana;
-    margin:10 15px;
-    text-shadow: 1px 3px 2px #666;
+    margin:10 25px;
+    text-shadow: 2px 3px 5px #888;
 }
-h2 {font-size: 1.571em} /* 22px */
-h3 {font-size: 1.429em} /* 20px */
+h2 {font-size: 22px}
+h3 {font-size: 20px}
 
 h2, h3, h4, h5, h6 {
+    margin: 10px;
     font-weight: 400;
     line-height: 1.1;
-    margin-bottom: .8em;
 }
 
 a:link, a:visited {
@@ -53,7 +54,7 @@ a:hover, a:active {
 /* Lists */
 ul {
     list-style: outside disc;
-    margin: 1em 0 1.5em 1.5em;
+    margin: 10px 0 15px 15px;
 }
 /*
 
@@ -64,14 +65,14 @@ ul {
 ::selection {background: #F6CF74; color: #fff;}
 
 /* Tables */
-table {margin: .5em auto 1.5em auto; width: 98%;}
+table {margin: 5px auto 15px auto; width: 98%;}
  
     /* Thead */
-    thead th {padding: .5em .4em; text-align: left;}
+    thead th {padding: 5px 4px; text-align: left;}
     thead td {}
  
     /* Tbody */
-    tbody td {padding: .5em .4em;}
+    tbody td {padding: 5px 4px;}
     tbody th {}
  
     /* Tfoot */
@@ -92,8 +93,8 @@ input.ovr   {background:#D6D3CE; color:black; border:1px solid #888888; font:bol
 textarea.in {height:100px; width:300px; }
 
 /* warnings */
-div.message-error   {width:100%; padding:2px 0px 2px 0px; font-weight:bold; background:#FF8080; }
-div.message-warning {width:100%; padding:2px 0px 2px 0px; font-weight:bold; background:#FFFF80; }
+div.message-error   {width:100%; padding:2px 0 2px 0; font-weight:bold; background:#FF8080; }
+div.message-warning {width:100%; padding:2px 0 2px 0; font-weight:bold; background:#FFFF80; }
 
 .warning    {color:red; }
  

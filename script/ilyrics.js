@@ -70,20 +70,38 @@ $(function()
     });
 
     $(document).on('click', '.tag', function(){
-        // pop up id3 info
-        var url = "get_id3.php?id=" + $(this).parent().attr('s_id');
+        // pop up tag info
+        var url = "get_tag.php?id=" + $(this).attr('s_id');
 
-        // get id3 in json
-        $.getJSON(url, function (id3)
+$("#div-tag").position({
+    my:        "left top",
+    at:        "right top",
+    of:        $(this), // or $("#otherdiv)
+    collision: "fit"
+});
+
+pos = $(this).position();
+pos_str = pos.top + '-' + pos.left;
+
+pos1 = $("#div-tag").position();
+pos1_str = pos1.top + '-' + pos1.left;
+
+log('tag pos: ' + pos_str + ', show in pos: ' + pos1_str);
+        // get tag in json
+        $.getJSON(url, function (tag)
         {
-            if(id3)
+            if(tag)
             {
-                // show id3
-                $.each(id3, function(key, val){
-                log('got id3: ' + key + ':' + val);
-
-                //$('#filelist').append("<li class='add_song' id='" + i + "'>" + val + "<img class='tag' alt='Tag' /></li>");
-            });
+                var tag_arr = ['title', 'artist', 'album', 'year', 'genre'];
+                $('#div-tag').html('<ul></ul>');
+                // show tag
+                $.each(tag, function(key, val){
+                    if ($.inArray(key, tag_arr) >= 0)
+                    {
+                        $('#div-tag ul').append("<li class='tag_item' id='" + key + "'>" + key + ' : ' + val + "</li>");
+                    }
+                });
+                $('#div-tag').show();
             }
         });
     });
@@ -142,8 +160,7 @@ function getMp3 ()
                 path = val.file.substr(0, pos);
                 file = val.file.substr(pos+1);
 
-                $('#filelist').append("<li class='add_song' s_id='" + val.s_id + "'" + 
-                    "path='" + path + "''>" + file + "<img class='tag' alt='Tag' /></li>");
+                $('#filelist').append("<li><span class='add_song' s_id='" + val.s_id + "'" + "path='" + path + "'>" + file + "</span><img  s_id='" + val.s_id + "' class='tag' alt='Tag' /></li>");
             });
 
             // default initial action:
@@ -154,7 +171,7 @@ function getMp3 ()
                     .appendTo(ele_song);
 
             // - add first song to playlist
-            $('#filelist>li:first').trigger( "click" );
+            $('#filelist span:first').trigger( "click" );
             $('.play_song:first()').trigger('click');
         }
     });
