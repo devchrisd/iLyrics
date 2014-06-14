@@ -176,14 +176,20 @@ function getLyrics (s_id)
     $.getJSON(url, function (json)
     {
         // log('result :', json);
+        hasLyrics = false;
 
         if (json)
         {
             setCover(json.cover);
-            // show lyrics
-            lrc.start(ele_song, ele_lyrics, json.lyrics);
+            if (json.lyrics)
+            {
+                hasLyrics = true;
+                // show lyrics
+                lrc.start(ele_song, ele_lyrics, json.lyrics);
+            }
         }
-        else
+
+        if (hasLyrics === false)
         {
             lrc.reset();
             setLyrics('No lyrics available.');
