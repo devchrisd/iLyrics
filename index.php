@@ -44,11 +44,7 @@
             <ul id='filelist' class='list'>
             </ul>
             <div id='div-tag'>
-                <ul>
-                    <li>tag content:
-                    </li>
-                </ul>
-
+                <ul></ul>
             </div>
         </div>
     </section>

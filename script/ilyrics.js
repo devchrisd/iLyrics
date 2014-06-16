@@ -73,23 +73,18 @@ $(function()
         // pop up tag info
         var url = "get_tag.php?id=" + $(this).attr('s_id');
 
-$("#div-tag").position({
-    my:        "left top",
-    at:        "right top",
-    of:        $(this), // or $("#otherdiv)
-    collision: "fit"
-});
+        $("#div-tag").position({
+            my:        "left top",
+            at:        "right top",
+            of:        $(this), // or $("#otherdiv)
+            collision: "flipfit"
+        });
 
-pos = $(this).position();
-pos_str = pos.top + '-' + pos.left;
-
-pos1 = $("#div-tag").position();
-pos1_str = pos1.top + '-' + pos1.left;
-
-log('tag pos: ' + pos_str + ', show in pos: ' + pos1_str);
         // get tag in json
         $.getJSON(url, function (tag)
         {
+            $('#div-tag').hide();
+
             if(tag)
             {
                 var tag_arr = ['title', 'artist', 'album', 'year', 'genre'];

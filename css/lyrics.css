@@ -128,13 +128,16 @@ footer h4
 #div-tag
 {
     display: none;
+    position: absolute;
     min-width: 200px;
     background-color: #eee;
 }
 
-#div-tag li
+#div-tag ul
 {
     list-style: none;
+    padding: 10px;
+    margin: 0;
 }
 
 #loop_status
