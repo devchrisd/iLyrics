@@ -107,7 +107,8 @@ footer h4
 
 #lyrics {
     line-height:25px;
-    height:200px;
+    min-height:200px;
+    max-height: 350px;
     overflow-y:scroll;
     text-align:left;
     font-size:13px;
@@ -130,14 +131,15 @@ footer h4
     display: none;
     position: absolute;
     min-width: 200px;
-    background-color: #eee;
+    background-color: #ccc;
 }
 
 #div-tag ul
 {
     list-style: none;
-    padding: 10px;
+    padding: 5px;
     margin: 0;
+    border: 1px solid #aaa;
 }
 
 #loop_status
