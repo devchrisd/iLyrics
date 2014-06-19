@@ -172,6 +172,80 @@ class mp3_lib
         return NULL;
     }
 
+    function set_song_id3(
+            $s_id,
+            $title,
+            $artist,
+            $album,
+            $year,
+            $genre
+        )
+    {
+        $TagData = $result = NULL;
+
+        // update DB
+        self::__get_dbi();
+
+        if (self::$media_dbi->connect())
+        {
+            // self::$media_dbi->select_db(Configure::MEDIA_DB);
+            $query = 'UPDATE ' . Configure::MEDIA_DB . '.song SET ';
+
+            $ID3_key = array(
+                        'title',
+                        'artist',
+                        'album',
+                        'year',
+                        'genre',
+                        );
+
+            foreach($ID3_key as $key)
+            {
+                if (empty($$key) === FALSE)
+                {
+                    $query .= $key . '="' . self::$media_dbi->escape_string($$key) . '",';
+                    $TagData[strtolower($key)][] = $$key;
+                }
+            }
+
+            if ($TagData !== NULL && count($TagData) > 0)
+            {
+                $query = rtrim($query, ",");
+            }
+            $query .= ' WHERE s_id="' . $s_id .'"';
+            $result = self::$media_dbi->update($query);
+        }
+
+        // update id3
+        $song_info = self::get_song_info($s_id);
+        self::set_ID3($TagData, $song_info['song_file']);
+        return $result;
+    }
+
+    public function set_ID3($TagData, $Filename)
+    {
+        require_once(dirname(__FILE__) . '/../getid3/write.php');
+
+        $tagwriter = new getid3_writetags;
+        $tagwriter->filename       = $Filename;
+        $tagwriter->tagformats     = array('id3v2.3');
+        $tagwriter->tag_encoding   = 'UTF-8';
+        $tagwriter->overwrite_tags = TRUE;  // FALSE;
+        $tagwriter->remove_other_tags = FALSE;
+
+        $tagwriter->tag_data = $TagData;
+        if ($tagwriter->WriteTags())
+        {
+            debug('Successfully wrote tags');
+            if (!empty($tagwriter->warnings))
+            {
+                debug('There were some warnings:' . $tagwriter->warnings);
+            }
+        } else {
+            debug ('Failed to write tags! ' . print_r($tagwriter->errors,1));
+        }
+    }
+
     public function get_ID3($song_file)
     {
         // Initialize getID3 engine
@@ -229,7 +303,7 @@ class mp3_lib
                     }
                 }
 
-                $query = 'UPDATE ' . Configure::MEDIA_DB . '.song set cover_file="' . self::$media_dbi->escape_string($data) . '" WHERE album="' . self::$media_dbi->escape_string($album) . '" AND artist="' .  self::$media_dbi->escape_string($artist) . '"';
+                $query = 'UPDATE ' . Configure::MEDIA_DB . '.song set cover_file="' . self::$media_dbi->escape_string($data) . '" WHERE album="' . self::$media_dbi->escape_string($album) . '" AND artist="' . self::$media_dbi->escape_string($artist) . '"';
                 break;
             case Configure::FIELD_LYRICS:
                 $query = 'UPDATE ' . Configure::MEDIA_DB . '.song set lyrics_file="' . self::$media_dbi->escape_string($data) . '" WHERE s_id=' . self::$media_dbi->escape_string($s_id);

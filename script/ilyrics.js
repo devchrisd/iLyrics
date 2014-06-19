@@ -69,10 +69,15 @@ $(function()
         getLyrics($(this).attr('s_id'));
     });
 
+    var tag_arr = ['title', 'artist', 'album', 'year', 'genre'];
+
     $(document).on('click', '.tag', function(){
         // pop up tag info
         var url = "get_tag.php?id=" + $(this).attr('s_id');
 
+        // Note: jQuery UI does not support positioning hidden elements.
+        $('#div-tag').html('');
+        $('#div-tag').show();
         $("#div-tag").position({
             my:        "left top",
             at:        "right top",
@@ -83,23 +88,60 @@ $(function()
         // get tag in json
         $.getJSON(url, function (tag)
         {
-            $('#div-tag').hide();
-
             if(tag)
             {
-                var tag_arr = ['title', 'artist', 'album', 'year', 'genre'];
-                $('#div-tag').attr('s_id', tag['s_id']);
-                $('#div-tag ul').html('');
+                $('#div-tag').html("<span class='right'>X</span><ul id='ul-tag'></ul><form id='form-tag' method='post' action='#'> </form>");
+                $('#form-tag').append("<input type='hidden' name='s_id' id='s_id' value='" + tag['s_id'] + "' />");
+
                 // show tag
                 $.each(tag, function(key, val){
                     if ($.inArray(key, tag_arr) >= 0)
                     {
                         $('#div-tag ul').append("<li class='tag_item' id='" + key + "'>" + key + ' : ' + val + "</li>");
+                        $('#form-tag').append('<span>' + key + '</span>' + '<input class="form_item" name="' + key + '" id="' + key + '" value="' + val + '" /><br />');
                     }
                 });
-                $('#div-tag').show();
+                $('#form-tag').append("<input type='submit' id='submit' value='Save' />");
+            }
+            else
+            {
+                $('#div-tag').hide();
             }
         });
+    });
+
+    $(document).on('click', '#div-tag>.right', function()
+    {
+        $('#div-tag').hide();
+        $('#div-tag').html('');
+    });
+
+    $(document).on('click', '.tag_item', function()
+    {
+        $('#div-tag ul').hide();
+        // show form
+        $('#form-tag').show();
+    });
+
+    $(document).on('submit', '#form-tag', function()
+    {
+        var url = "save_tag.php?";
+
+        title  = $('#form-tag #title').val();
+        artist = $('#form-tag #artist').val();
+        album  = $('#form-tag #album').val();
+        year   = $('#form-tag #year').val();
+        genre  = $('#form-tag #genre').val();
+
+        url += 's_id=' + $('#s_id').val() + '&title=' + title + '&artist=' + artist + '&album=' + album + '&year=' + year + '&genre=' + genre;
+        // log ('save tag ' + url);
+        $.ajax(url)
+        .done( function(data)
+        {
+            $('#div-tag>.right').click();
+        });
+
+        return false;
     });
 
     // play next song in playlist

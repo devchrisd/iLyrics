@@ -24,7 +24,7 @@ if (isset($_GET['year']) === true && empty($_GET['year']) !== true)
 if (isset($_GET['genre']) === true && empty($_GET['genre']) !== true)
     $genre =  $_GET['genre'];
 
-$result = mp3_lib::set_song_info(
+$result = mp3_lib::set_song_id3(
             $s_id,
             $title,
             $artist,

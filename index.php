@@ -43,9 +43,7 @@
             </header>
             <ul id='filelist' class='list'>
             </ul>
-            <div id='div-tag'>
-                <ul></ul>
-            </div>
+            <div id='div-tag'></div>
         </div>
     </section>
 

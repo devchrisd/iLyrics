@@ -90,6 +90,22 @@ input.ovr   {background:#D6D3CE; color:black; border:1px solid #888888; font:bol
 .mid    {width:250px; }
 .long   {width:450px; }
 
+.left
+{
+    text-align: left;
+    width: 100%;
+}
+
+.center
+{
+    text-align: center;
+}
+
+.right
+{
+    text-align: right;
+}
+
 textarea.in {height:100px; width:300px; }
 
 /* warnings */
