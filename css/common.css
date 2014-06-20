@@ -104,6 +104,7 @@ input.ovr   {background:#D6D3CE; color:black; border:1px solid #888888; font:bol
 .right
 {
     text-align: right;
+    padding: 5px;
 }
 
 textarea.in {height:100px; width:300px; }

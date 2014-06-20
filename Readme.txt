@@ -47,3 +47,11 @@ SETUP:
 
 - Run [sitename_iLyrics]/get_mp3?r=1 to scan the audio / lyrics and cover folder to setup database
 
+
+
+TODO:
+
+- edit lyrics, set offset
+- save playlist
+
+

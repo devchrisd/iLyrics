@@ -91,7 +91,7 @@ $(function()
             if(tag)
             {
                 $('#div-tag').html("<span class='right'>X</span><ul id='ul-tag'></ul><form id='form-tag' method='post' action='#'> </form>");
-                $('#form-tag').append("<input type='hidden' name='s_id' id='s_id' value='" + tag['s_id'] + "' />");
+                $('#form-tag').append("<input type='hidden' name='tag_s_id' id='tag_s_id' value='" + tag['s_id'] + "' />");
 
                 // show tag
                 $.each(tag, function(key, val){
@@ -110,6 +110,7 @@ $(function()
         });
     });
 
+    // hide div by clicking 'X'
     $(document).on('click', '#div-tag>.right', function()
     {
         $('#div-tag').hide();
@@ -133,7 +134,7 @@ $(function()
         year   = $('#form-tag #year').val();
         genre  = $('#form-tag #genre').val();
 
-        url += 's_id=' + $('#s_id').val() + '&title=' + title + '&artist=' + artist + '&album=' + album + '&year=' + year + '&genre=' + genre;
+        url += 's_id=' + $('#tag_s_id').val() + '&title=' + title + '&artist=' + artist + '&album=' + album + '&year=' + year + '&genre=' + genre;
         // log ('save tag ' + url);
         $.ajax(url)
         .done( function(data)
@@ -177,6 +178,35 @@ $(function()
         $('#loop_status').text(status);
 
     });
+
+    $('#lyrics_edit').on('click', function(){
+        $('#lyrics').toggle();
+        $('#form-raw-lyrics').toggle();
+    });
+
+    $(document).on('submit', '#form-raw-lyrics', function()
+    {
+        var lyrics_url = "save_lyrics.php";
+
+        lyrics_val = $('#raw_lyrics').val();
+
+        // lyrics_data = 's_id=' + $('#lyrics_s_id').val() + '&lyrics=' + lyrics;
+        log ('save lyrics ' + lyrics_url);
+        $.ajax({
+            url: lyrics_url,
+            type: "POST",
+            data: { s_id: $('#lyrics_s_id').val(), lyrics: lyrics_val}
+        })
+        .done( function(result)
+        {
+            log(result);
+            lrc.start(ele_song, ele_lyrics, lyrics_val);
+            $('#lyrics_edit').click();
+        });
+
+        return false;
+    });
+
 });
 
 // Get lyrics from server
@@ -198,7 +228,7 @@ function getMp3 ()
                 path = val.file.substr(0, pos);
                 file = val.file.substr(pos+1);
 
-                $('#filelist').append("<li><span class='add_song' s_id='" + val.s_id + "'" + "path='" + path + "'>" + file + "</span><img  s_id='" + val.s_id + "' class='tag' alt='Tag' /></li>");
+                $('#filelist').append("<li><span class='add_song' s_id='" + val.s_id + "'" + "path='" + path + "'>" + file + "</span><img s_id='" + val.s_id + "' class='tag' alt='Tag' /></li>");
             });
 
             // default initial action:
@@ -230,7 +260,6 @@ function getLyrics (s_id)
     // get lyrics in json
     $.getJSON(url, function (json)
     {
-        // log('result :', json);
         hasLyrics = false;
 
         if (json)
@@ -241,6 +270,9 @@ function getLyrics (s_id)
                 hasLyrics = true;
                 // show lyrics
                 lrc.start(ele_song, ele_lyrics, json.lyrics);
+
+                $('#raw_lyrics').val(json.lyrics);
+                $('#lyrics_s_id').val(s_id);
             }
         }
 

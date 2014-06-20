@@ -31,6 +31,7 @@ header.top
 {
     width: 98%;
     display: table-cell;
+    text-align: right;
     background: #aaa;
 }
 
@@ -105,10 +106,20 @@ footer h4
     font-weight:bold;
 }
 
+#raw_lyrics
+{
+    width: 96%;
+    height: 260px;
+    overflow-y:scroll;
+    text-align:left;
+    font-size:12px;
+}
+
 #lyrics {
+    position: relative;
     line-height:25px;
-    min-height:200px;
-    max-height: 350px;
+    min-height:120px;
+    max-height: 200px;
     overflow-y:scroll;
     text-align:left;
     font-size:13px;
@@ -135,6 +146,7 @@ footer h4
     padding: 5px;
     margin: 0;
     border: 1px solid #aaa;
+    z-index: 999;
 }
 
 #div-tag ul
@@ -144,7 +156,7 @@ footer h4
     margin: 0;
 }
 
-#form-tag
+#form-tag, #form-raw-lyrics
 {
     display: none;
 }

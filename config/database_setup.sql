@@ -1,4 +1,4 @@
-CREATE DATABASE IF NOT EXISTS `media`;
+CREATE DATABASE IF NOT EXISTS `media` default CHARACTER SET utf8;
 
 USE `media`;
 
