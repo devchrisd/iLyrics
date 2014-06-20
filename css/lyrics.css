@@ -95,7 +95,7 @@ footer h4
     padding: 5px;
 }
 
-.list span
+.list span, #lyrics_edit
 {
     cursor:pointer;
 }

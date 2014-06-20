@@ -30,8 +30,8 @@
         <div class='div-list'>
             <header>
                 <h3>Playlist
-                <img class='loop right' alt='O' src='images/loop-square_25.jpg' />
                 <span id='loop_status' class='right'></span>
+                <img class='loop right' alt='O' src='images/loop-square_25.jpg' title='repeat all' />
                 </h3>
             </header>
             <ul id='playlist' class='list'>
@@ -48,7 +48,7 @@
     </section>
 
     <section class='container-right'>
-        <div id='lyrics_edit' class='right'>E</div>
+        <div id='lyrics_edit' class='right' title='Edit lyrics'>[E]</div>
         <div id='lyrics'>Fetching lyrics ...</div>
         <form id='form-raw-lyrics' action='#'>
             <input type='hidden' id='lyrics_s_id' name='lyrics_s_id' value='' />
