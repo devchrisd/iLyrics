@@ -254,7 +254,8 @@ function getLyrics (s_id)
     // var url = "get_lyrics.php?id=" + ele_song.attr('src').substring(pos+1);
     var url = "get_lyrics.php?id=" + s_id;
 
-    log('url', url);
+    // log('url', url);
+    setLyrics('Fetching lyrics ...');
 
     // get lyrics in json
     $.getJSON(url, function (json)
@@ -264,7 +265,7 @@ function getLyrics (s_id)
         if (json)
         {
             setCover(json.cover);
-            if (json.lyrics)
+            if (json.lyrics && json.lyrics.length > 0)
             {
                 hasLyrics = true;
                 // show lyrics
@@ -277,7 +278,6 @@ function getLyrics (s_id)
 
         if (hasLyrics === false)
         {
-            lrc.reset();
             setLyrics('No lyrics available.');
         }
     });
@@ -311,7 +311,8 @@ function getLyrics (s_id)
 
 function setLyrics(lyrics)
 {
-    ele_lyrics.html(lyrics);
+    lrc.setLyrics(ele_lyrics, lyrics);
+    // ele_lyrics.empty().append(lyrics);
 }
 
 function setCover(cover)

@@ -28,10 +28,18 @@ var lrc = {
         this.currentLine= 0;
         this.scrollh    = 0;
         this.islrc      = true;
+        this.elementLyrics.empty();
 
         // clear timer so it won't replace messages in lyrics block
         if (this.lyricsPlayTimeout !== null)
             clearTimeout(this.lyricsPlayTimeout);
+    },
+
+    setLyrics: function(ele_lyrics, lrc_lyrics)
+    {
+        this.elementLyrics  = ele_lyrics;
+        this.reset();
+        this.elementLyrics.append(lrc_lyrics);
     },
 
     // ele_song:   element, 
@@ -41,10 +49,11 @@ var lrc = {
     {
         if (ele_song.attr('src').length > 0)
         {
-            this.reset();
             this.elementSong    = ele_song;
             this.elementLyrics  = ele_lyrics;
-            if (this.processData(lrc_lyrics))
+            this.reset();
+
+            if (lrc_lyrics !== null && this.processData(lrc_lyrics))
             {
                 // sort by show time
                 this.sortAr();
