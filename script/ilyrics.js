@@ -30,8 +30,7 @@ $(function()
     $(document).on('click', '.add_song', function(){
         // add to playlist
         $('#playlist').append(
-                                "<li><span class='play_song' s_id='" + $(this).attr('s_id') + "' " + 
-                                "path='" + $(this).attr('path') + "'>" + $(this).text() + 
+                                "<li><span class='play_song' s_id='" + $(this).attr('s_id') + "' path='" + $(this).attr('path') + "' title='click to play'>" + $(this).text() + 
                                 "</span><img class='remove' alt='[X]' title='remove from list' /></li>"
                             );
     });
@@ -228,7 +227,7 @@ function getMp3 ()
                 path = val.file.substr(0, pos);
                 file = val.file.substr(pos+1);
 
-                $('#filelist').append("<li><span class='add_song' s_id='" + val.s_id + "'" + "path='" + path + "'>" + file + "</span><img s_id='" + val.s_id + "' class='tag' alt='[Tag]' title='show/edit tags' /></li>");
+                $('#filelist').append("<li><span class='add_song' s_id='" + val.s_id + "' path='" + path + "' title='click to add to playlist'>" + file + "</span><img s_id='" + val.s_id + "' class='tag' alt='[Tag]' title='show/edit tags' /></li>");
             });
 
             // default initial action:

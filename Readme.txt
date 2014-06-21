@@ -35,10 +35,11 @@ USAGE:
 
     - If lyrics is not available locally, it will try to search and download online.
 
-- Apache or the webserver user/group must have permission to create/modify file in lyric/ and image/cover
 
 SETUP:
 
+- Apache or the webserver user/group must have permission to create/modify file in lyric/, audio/, and image/cover. Use command:
+    sudo chown www:www [dir]
 - Build up database with sql script in config/database_setup.sql
 - create user 'developer' in mysql:
 	mysql> create user 'developer'@'localhost' identified by 'ppp';
