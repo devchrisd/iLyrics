@@ -80,6 +80,10 @@ class mp3_lib
 
         self::__get_dbi();
 
+        // delete current data 
+        $query = 'DELETE FROM ' . Configure::MEDIA_DB . '.song';
+        self::$media_dbi->update($query);
+
         // save each file info into database
         foreach ($this->mp3_arr as $key => $value)
         {

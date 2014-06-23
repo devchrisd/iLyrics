@@ -17,6 +17,7 @@ var lrc = {
     lytext: new Array(),// lyrics text
     lytime: new Array(),// lyrics time
     lyricsPlayTimeout: null,
+    lyricsScrollTimeout: null,
 
     reset: function()
     {
@@ -33,6 +34,8 @@ var lrc = {
         // clear timer so it won't replace messages in lyrics block
         if (this.lyricsPlayTimeout !== null)
             clearTimeout(this.lyricsPlayTimeout);
+        if (this.lyricsPlayTimeout !== null)
+            clearTimeout(this.lyricsScrollTimeout);
     },
 
     setLyrics: function(ele_lyrics, lrc_lyrics)
@@ -55,6 +58,12 @@ var lrc = {
 
             if (lrc_lyrics !== null && this.processData(lrc_lyrics))
             {
+                if (this.islrc === false)
+                {
+                    this.elementLyrics.append("<span>" + this.lytext[1]+"</span><br>");
+                    return;
+                }
+
                 // sort by show time
                 this.sortAr();
 
@@ -62,7 +71,7 @@ var lrc = {
                 // this.index is the max value from this.processData
                 this.lytext[this.index] = '';
                 this.lytime[this.index] = this.lytime[this.index-1] + 5;
-                if (this.islrc === true) this.scrollBar();
+                this.setLyricsScrollTimeOut();
                 this.setLyricsPlayTimeOut();
             }
         }
@@ -73,13 +82,14 @@ var lrc = {
     {
         if ( this.isPlaying() === false )
         {
-            window.setTimeout("lrc.scrollBar()",this.scrollInterval);
+            this.setLyricsScrollTimeOut();
             return;
         }
 
         line_height = this.elementLyrics.css('line-height');
+        // remove 'px' from string, get the digits only
         line_height = parseInt(line_height.substring(0, line_height.lastIndexOf('p')));
-        this.scrollh = this.currentLine * (line_height+1); // amount to scroll top. line-height:25px;
+        this.scrollh = this.currentLine * (line_height); // amount to scroll top. line-height:25px;
         if (this.elementLyrics.scrollTop() <= this.scrollh)
         {
             position = this.elementLyrics.scrollTop() + 1;
@@ -90,7 +100,7 @@ var lrc = {
         }
         this.elementLyrics.scrollTop(position);
 
-        window.setTimeout("lrc.scrollBar()",this.scrollInterval);
+        this.setLyricsScrollTimeOut();
     },
 
     // get offset(time shift) from lyrics
@@ -244,7 +254,13 @@ var lrc = {
                 this.elementSong[0].paused
                 )
             )
-        return false;
+            return false;
+    },
+
+    setLyricsScrollTimeOut: function()
+    {
+        this.lyricsScrollTimeout = window.setTimeout("lrc.scrollBar()",this.scrollInterval);
+        return;
     },
 
     setLyricsPlayTimeOut: function()

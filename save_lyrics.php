@@ -14,7 +14,7 @@ if (isset($_POST['lyrics']) === true && empty($_POST['lyrics']) !== true)
 
 $result = mp3_lib::get_song_info($s_id);
 
-$filename = $result['song_file'];
+$filename = $result['lyrics_file'];
 
 $fp = fopen($filename, 'w');
 fwrite($fp, $lyrics);

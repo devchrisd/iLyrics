@@ -24,6 +24,7 @@ class mysql_interface_class extends dbi_class
             $c = mysql_connect($this->host, $this->user, $this->passwd, false);
             if($c)
             {
+                mysql_query("set names utf8");
                 $this->connection = &$c;
                 if($this->database != null)
                 {
