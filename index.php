@@ -31,10 +31,12 @@
             <header>
                 <h3>Playlist
                 <span id='loop_status' class='right'></span>
-                <img class='loop right' alt='O' src='images/loop-square_25.jpg' title='repeat all' />
+                <img class='loop float_right_button' alt='O' src='images/loop-square_25.jpg' title='repeat all' />
+                <img class='float_right_button' src='image/save_file.jpg' title='save playlist' alt='save' />
+                <img class='float_right_button' src='image/load_file.jpg' title='load playlist' alt='load' />
                 </h3>
             </header>
-            <ul id='playlist' class='list'>
+            <ul id='playlist' class='list' p_id=''>
             </ul>
         </div>
         <div class='div-list'>

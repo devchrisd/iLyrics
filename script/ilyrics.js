@@ -2,7 +2,7 @@ var ele_song;   // element contains the song
 var ele_lyrics; // element contains the lyrics
 var play_index;   // current position in playlist
 var loop;
-
+var controller_url = 'iLyrics_controller.php';
 $(function()
 {
     $(window).load(function ()
@@ -31,7 +31,7 @@ $(function()
         // add to playlist
         $('#playlist').append(
                                 "<li><span class='play_song' s_id='" + $(this).attr('s_id') + "' path='" + $(this).attr('path') + "' title='click to play'>" + $(this).text() + 
-                                "</span><img class='remove' alt='[X]' title='remove from list' /></li>"
+                                "</span><img class='float_right_button remove' alt='[X]' title='remove from list' /></li>"
                             );
     });
 
@@ -72,7 +72,7 @@ $(function()
 
     $(document).on('click', '.tag', function(){
         // pop up tag info
-        var url = "get_tag.php?id=" + $(this).attr('s_id');
+        var url = controller_url + "?s_id=" + $(this).attr('s_id') + '&action=get_tag';
 
         // Note: jQuery UI does not support positioning hidden elements.
         $('#div-tag').html('');
@@ -89,7 +89,7 @@ $(function()
         {
             if(tag)
             {
-                $('#div-tag').html("<span class='right'>X</span><ul id='ul-tag'></ul><form id='form-tag' method='post' action='#'> </form>");
+                $('#div-tag').html("<span class='float_right_button'>X</span><ul id='ul-tag'></ul><form id='form-tag' method='post' action='#'> </form>");
                 $('#form-tag').append("<input type='hidden' name='tag_s_id' id='tag_s_id' value='" + tag['s_id'] + "' />");
 
                 // show tag
@@ -110,7 +110,7 @@ $(function()
     });
 
     // hide div by clicking 'X'
-    $(document).on('click', '#div-tag>.right', function()
+    $(document).on('click', '#div-tag>.float_right_button', function()
     {
         $('#div-tag').hide();
         $('#div-tag').html('');
@@ -125,7 +125,7 @@ $(function()
 
     $(document).on('submit', '#form-tag', function()
     {
-        var url = "save_tag.php?";
+        var url = controller_url + "?action=save_tag";
 
         title  = $('#form-tag #title').val();
         artist = $('#form-tag #artist').val();
@@ -133,12 +133,12 @@ $(function()
         year   = $('#form-tag #year').val();
         genre  = $('#form-tag #genre').val();
 
-        url += 's_id=' + $('#tag_s_id').val() + '&title=' + title + '&artist=' + artist + '&album=' + album + '&year=' + year + '&genre=' + genre;
+        url += '&s_id=' + $('#tag_s_id').val() + '&title=' + title + '&artist=' + artist + '&album=' + album + '&year=' + year + '&genre=' + genre;
         // log ('save tag ' + url);
         $.ajax(url)
         .done( function(data)
         {
-            $('#div-tag>.right').click();
+            $('#div-tag>.float_right_button').click();
         });
 
         return false;
@@ -185,7 +185,7 @@ $(function()
 
     $(document).on('submit', '#form-raw-lyrics', function()
     {
-        var lyrics_url = "save_lyrics.php";
+        var lyrics_url = controller_url + "";
 
         lyrics_val = $('#raw_lyrics').val();
 
@@ -194,7 +194,7 @@ $(function()
         $.ajax({
             url: lyrics_url,
             type: "POST",
-            data: { s_id: $('#lyrics_s_id').val(), lyrics: lyrics_val}
+            data: { action: 'save_lyrics', s_id: $('#lyrics_s_id').val(), lyrics: lyrics_val}
         })
         .done( function(result)
         {
@@ -211,7 +211,7 @@ $(function()
 // Get lyrics from server
 function getMp3 ()
 {
-    var url = "get_mp3.php";
+    var url = controller_url + "?action=lib_display";
 
     // get mp3 file list in json
     $.getJSON(url, function (mp3)
@@ -227,7 +227,7 @@ function getMp3 ()
                 path = val.file.substr(0, pos);
                 file = val.file.substr(pos+1);
 
-                $('#filelist').append("<li><span class='add_song' s_id='" + val.s_id + "' path='" + path + "' title='click to add to playlist'>" + file + "</span><img s_id='" + val.s_id + "' class='tag' alt='[Tag]' title='show/edit tags' /></li>");
+                $('#filelist').append("<li><span class='add_song' s_id='" + val.s_id + "' path='" + path + "' title='click to add to playlist'>" + file + "</span><img s_id='" + val.s_id + "' class='float_right_button tag' alt='[Tag]' title='show/edit tags' /></li>");
             });
 
             // default initial action:
@@ -252,7 +252,7 @@ function getLyrics (s_id)
     // var pos = ele_song.attr('src').lastIndexOf("/");
     // attach song_file name to the query
     // var url = "get_lyrics.php?id=" + ele_song.attr('src').substring(pos+1);
-    var url = "get_lyrics.php?id=" + s_id;
+    var url = controller_url + "?action=get_lyrics&s_id=" + s_id;
 
     // log('url', url);
     setLyrics('Fetching lyrics ...');
@@ -333,12 +333,12 @@ function getCover(s_id)
     // var pos = ele_song.attr('src').lastIndexOf("/");
     // attach song_file name to the query
     // var url = "get_lyrics.php?id=" + ele_song.attr('src').substring(pos+1);
-    var url = "get_cover.php?id=" + s_id;
+    var url = controller_url + "?s_id=" + s_id + '&action=get_cover';
 
     // get lyrics in json
     $.getJSON(url, function (json)
     {
-        // log('result :', json);
+        log('result :', json);
 
         if (json && json.length > 0)
         {

@@ -83,6 +83,8 @@ class mp3_lib
         // delete current data 
         $query = 'DELETE FROM ' . Configure::MEDIA_DB . '.song';
         self::$media_dbi->update($query);
+        $query = 'ALTER TABLE ' . Configure::MEDIA_DB . '.song AUTO_INCREMENT=0';
+        self::$media_dbi->update($query);
 
         // save each file info into database
         foreach ($this->mp3_arr as $key => $value)
@@ -99,9 +101,9 @@ class mp3_lib
                 $year   = isset($id3['year'])   ? $id3['year']  : '';
                 $genre  = isset($id3['genre'])  ? $id3['genre'] : '';
 
-                $_title  = preg_replace('/\s+/', '', $title);
-                $_artist = preg_replace('/\s+/', '', $artist);
-                $_album  = preg_replace('/\s+/', '', $album);
+                $_title  = _covert_for_URL_string($title);
+                $_artist = _covert_for_URL_string($artist);
+                $_album  = _covert_for_URL_string($album);
                 $lyrics_file = Configure::LYRICS_PATH . $_artist . '_' . $_title . '.lrc';
                 if (file_exists($lyrics_file) === FALSE)
                 {
@@ -144,16 +146,25 @@ class mp3_lib
         if (self::$media_dbi->connect())
         {
             // self::$media_dbi->select_db(Configure::MEDIA_DB);
-            $query = 'SELECT s_id, song_file from ' . Configure::MEDIA_DB . '.song order by s_id;';
+            $query = 'SELECT s_id, song_file, title from ' . Configure::MEDIA_DB . '.song order by s_id;';
             if ($result = self::$media_dbi->select($query) )
             {
                 while( $row = self::$media_dbi->fetch_row_assoc($result))
                 {
                     $list[$index]['s_id'] = $row['s_id'];
+                    $list[$index]['title'] = $row['title'];
                     $list[$index++]['file'] = $row['song_file'];
                 }
             }
         }
+
+$test_arr = array(
+    // 'audio/01.七个母音.mp3',
+        'audio/富士山下.mp3',
+        // 'audio/对不起谢谢.mp3',
+);
+foreach ($test_arr as $value)
+        self::get_ID3($value);
         return $list;
     }
 
@@ -232,7 +243,7 @@ class mp3_lib
 
         $tagwriter = new getid3_writetags;
         $tagwriter->filename       = $Filename;
-        $tagwriter->tagformats     = array('id3v2.3');
+        $tagwriter->tagformats     = array('id3v1', 'id3v2.3', 'id3v2.4', 'ape');
         $tagwriter->tag_encoding   = 'UTF-8';
         $tagwriter->overwrite_tags = TRUE;  // FALSE;
         $tagwriter->remove_other_tags = FALSE;
@@ -263,10 +274,12 @@ class mp3_lib
          metadata is all available in one location for all tag formats
          metainformation is always available under [tags] even if this is not called
         */
+        debug( print_r($ThisFileInfo,1));
+       
         getid3_lib::CopyTagsToComments($ThisFileInfo);
         if (isset($ThisFileInfo['comments']) && !empty($ThisFileInfo['comments']))
         {
-            // debug(print_r($ThisFileInfo['comments'],1));
+            // debug('### comments: ' . print_r($ThisFileInfo['comments'],1));
 
             $id3['title']  = isset($ThisFileInfo['comments']['title'][0])  ? $ThisFileInfo['comments']['title'][0]  : '';
             $id3['artist'] = isset($ThisFileInfo['comments']['artist'][0]) ? $ThisFileInfo['comments']['artist'][0] : '';
@@ -282,6 +295,7 @@ class mp3_lib
             $filename = basename($song_file);
             $id3['title'] = substr($filename, 0, strrpos($filename, '.'));
         }
+        // debug( print_r($id3,1));
 
         return $id3;
     }

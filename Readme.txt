@@ -46,13 +46,12 @@ SETUP:
 	mysql> grant all on media.* to 'developer'@'localhost';
 	mysql> flush privileges;
 
-- Run [sitename_iLyrics]/get_mp3?r=1 to scan the audio / lyrics and cover folder to setup database
+- Run [sitename_iLyrics]/iLyrics_controller.php?action=lib_refresh to scan the audio / lyrics and cover folder to setup database
 
 
 
 TODO:
 
-- edit lyrics, set offset
 - save playlist
 
 

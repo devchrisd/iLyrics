@@ -130,9 +130,10 @@ footer h4
     padding-bottom:50px;
 }
 
-.tag, .remove, .loop, #div-tag>.right
+.float_right_button
 {
     cursor:pointer;
+    padding-right: 5px;
     margin: 0;
     float: right;
 }

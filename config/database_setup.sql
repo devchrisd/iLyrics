@@ -8,10 +8,17 @@ CREATE TABLE IF NOT EXISTS `song` (
   `title` varchar(128) NOT NULL DEFAULT '',
   `album` varchar(128) NOT NULL DEFAULT '',
   `artist` varchar(128) NOT NULL DEFAULT '',
-  `year` varchar(18) NOT NULL DEFAULT '',
+  `year` varchar(28) NOT NULL DEFAULT '',
   `genre` varchar(60) NOT NULL DEFAULT '',
   `lyrics_file` varchar(256) NOT NULL DEFAULT '',
-  `cover_file`  varchar(256) NOT NULL DEFAULT '',
+  `cover_file` varchar(256) NOT NULL DEFAULT '',
   PRIMARY KEY  (`s_id`),
   UNIQUE INDEX `idx_song_file` (`song_file`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+ COLLATE utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `playlist` (
+  `p_id` SMALLINT(5) unsigned NOT NULL auto_increment,
+  `playlist_file` varchar(256) NOT NULL DEFAULT '',
+  PRIMARY KEY  (`p_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

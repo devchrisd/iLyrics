@@ -135,11 +135,9 @@ class ilyrics
             )
         {
             debug(__METHOD__ . ' song_info for ' . $this->song_file . ':' . print_r($this->song_info,1));
-            $title  = $this->song_info['title'];
-            $artist = $this->song_info['artist'];
 
-            $_title  = preg_replace('/\s+/', '', $title);
-            $_artist = preg_replace('/\s+/', '', $artist);
+            $_title  = _covert_for_URL_string($this->song_info['title']);
+            $_artist = _covert_for_URL_string($this->song_info['artist']);
 
             // build possible lyrics file name
             if ($this->lyrics_files === NULL)
@@ -153,7 +151,7 @@ class ilyrics
             if ($this->cover_file === NULL)
             {
                 $album = $this->song_info['album'];
-                $_album = preg_replace('/\s+/', '', $album);
+                $_album = _covert_for_URL_string($album);
                 $this->cover_file = self::COVER_PATH . $_artist . '_' . $_album;
             }
         }
@@ -178,6 +176,13 @@ class ilyrics
         {
             debug( "get file " . $this->lyrics_files[0]);
             $this->__fetch_lyric();
+
+            if (empty($this->song_info['lyrics_file']) === TRUE)
+            {
+                // save file name to database
+                $ret = mp3_lib::update_record($this->s_id, $this->lyrics_files[0], Configure::FIELD_LYRICS);
+                $this->song_info['lyrics_file'] = $this->lyrics_files[0];
+            }
         }
         else
         {
