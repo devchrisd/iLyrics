@@ -170,15 +170,15 @@ class mp3_lib
             }
         }
 
-$test_arr = array(
-    // 'audio/01.七个母音.mp3',
-        // 'audio/富士山下.mp3',
-    'audio/01.天边.mp3',
-        // 'audio/02.轻轻地告诉你.mp3',
-        // 'audio/对不起谢谢.mp3',
-);
-foreach ($test_arr as $value)
-        self::get_ID3($value);
+// $test_arr = array(
+//     // 'audio/01.七个母音.mp3',
+//         // 'audio/富士山下.mp3',
+//     'audio/01.天边.mp3',
+//         // 'audio/02.轻轻地告诉你.mp3',
+//         // 'audio/对不起谢谢.mp3',
+// );
+// foreach ($test_arr as $value)
+//         self::get_ID3($value);
         return $list;
     }
 
