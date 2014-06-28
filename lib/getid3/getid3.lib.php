@@ -955,6 +955,7 @@ class getid3_lib
 						$converted_string = rtrim($converted_string, "\x00");
 						break;
 				}
+// error_log(__METHOD__ . ", convert $string: $in_charset, $out_charset, $converted_string");
 				return $converted_string;
 			}
 

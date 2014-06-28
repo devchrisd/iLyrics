@@ -11,7 +11,6 @@ require_once('lib/audio/mp3_lib.class.php');
 $s_id = NULL;
 if (isset($_REQUEST['s_id']) === true && empty($_REQUEST['s_id']) !== true)
     $s_id =  $_REQUEST['s_id'];
-debug('get_it action:' . $action);
 
 switch ($action) {
     case 'lib_display':

@@ -1160,6 +1160,8 @@ class getID3
 
 			// convert string
 			elseif (is_string($value)) {
+				// error_log(__METHOD__ . ' , detect encoding=' . mb_detect_encoding($value));
+				$encoding = mb_detect_encoding($value);
 				$array[$key] = trim(getid3_lib::iconv_fallback($encoding, $this->encoding, $value));
 			}
 		}

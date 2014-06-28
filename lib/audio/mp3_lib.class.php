@@ -80,60 +80,72 @@ class mp3_lib
 
         self::__get_dbi();
 
-        // delete current data 
-        $query = 'DELETE FROM ' . Configure::MEDIA_DB . '.song';
-        self::$media_dbi->update($query);
-        $query = 'ALTER TABLE ' . Configure::MEDIA_DB . '.song AUTO_INCREMENT=0';
-        self::$media_dbi->update($query);
-
-        // save each file info into database
-        foreach ($this->mp3_arr as $key => $value)
+        if (self::$media_dbi->connect())
         {
-            //$iLyrics = new ilyrics(basename($value));
-            $title = $artist = $album = $year = $genre = '';
-            // get id3
-            $id3 = $this->get_ID3($value);
-            if ($id3 !== NULL)
-            {
-                $title  = isset($id3['title'])  ? $id3['title'] : '';
-                $artist = isset($id3['artist']) ? $id3['artist']: '';
-                $album  = isset($id3['album'])  ? $id3['album'] : '';
-                $year   = isset($id3['year'])   ? $id3['year']  : '';
-                $genre  = isset($id3['genre'])  ? $id3['genre'] : '';
+        // delete current data 
+            $query = 'DELETE FROM ' . Configure::MEDIA_DB . '.song';
+            self::$media_dbi->update($query);
+            $query = 'ALTER TABLE ' . Configure::MEDIA_DB . '.song AUTO_INCREMENT=0';
+            self::$media_dbi->update($query);
 
-                $_title  = _covert_for_URL_string($title);
-                $_artist = _covert_for_URL_string($artist);
-                $_album  = _covert_for_URL_string($album);
-                $lyrics_file = Configure::LYRICS_PATH . $_artist . '_' . $_title . '.lrc';
-                if (file_exists($lyrics_file) === FALSE)
+            // save each file info into database
+            foreach ($this->mp3_arr as $key => $value)
+            {
+                //$iLyrics = new ilyrics(basename($value));
+                $title = $artist = $album = $year = $genre = '';
+                // get id3
+                $id3 = $this->get_ID3($value);
+                if ($id3 !== NULL)
                 {
-                    $lyrics_file = NULL;
-                }
-                $cover_file = Configure::COVER_PATH . $_artist . '_' . $_album . '.jpg';
-                if (file_exists($cover_file) === FALSE)
-                {
-                    $cover_file = NULL;
-                }
-            }
+                    $title  = isset($id3['title'])  ? $id3['title'] : '';
+                    $artist = isset($id3['artist']) ? $id3['artist']: '';
+                    $album  = isset($id3['album'])  ? $id3['album'] : '';
+                    $year   = isset($id3['year'])   ? $id3['year']  : '';
+                    $genre  = isset($id3['genre'])  ? $id3['genre'] : '';
 
-            $query = 'REPLACE INTO ' . Configure::MEDIA_DB . '.song'
-                    . " SET song_file='" . self::$media_dbi->escape_string($value) . "',"
-                    . " title='" . self::$media_dbi->escape_string($title) . "',"
-                    . " artist='" . self::$media_dbi->escape_string($artist) . "',"
-                    . " album='" . self::$media_dbi->escape_string($album) . "',"
-                    . " year='" . self::$media_dbi->escape_string($year) . "',"
-                    . " genre='" . self::$media_dbi->escape_string($genre) . "'"
-                    ;
-            if ($lyrics_file !== NULL)
-            {
-                $query .= ", lyrics_file='" . self::$media_dbi->escape_string($lyrics_file) . "'";
+                    $_title  = _covert_for_URL_string($title);
+                    $_artist = _covert_for_URL_string($artist);
+                    $_album  = _covert_for_URL_string($album);
+                    $lyrics_file = Configure::LYRICS_PATH . $_artist . '_' . $_title . '.lrc';
+                    if (file_exists($lyrics_file) === FALSE)
+                    {
+                        $lyrics_file = NULL;
+                    }
+                    $cover_file = Configure::COVER_PATH . $_artist . '_' . $_album . '.jpg';
+                    if (file_exists($cover_file) === FALSE)
+                    {
+                        $cover_file = NULL;
+                    }
+                }
+
+                $query = 'REPLACE INTO ' . Configure::MEDIA_DB . '.song'
+                        . " SET song_file='" . self::$media_dbi->escape_string($value) . "',"
+                        . " title='" . self::$media_dbi->escape_string($title) . "',"
+                        . " artist='" . self::$media_dbi->escape_string($artist) . "',"
+                        . " album='" . self::$media_dbi->escape_string($album) . "',"
+                        . " year='" . self::$media_dbi->escape_string($year) . "',"
+                        . " genre='" . self::$media_dbi->escape_string($genre) . "'"
+                        ;
+                if ($lyrics_file !== NULL)
+                {
+                    $query .= ", lyrics_file='" . self::$media_dbi->escape_string($lyrics_file) . "'";
+                }
+                if ($cover_file !== NULL)
+                {
+                    $query .= ", cover_file='" . self::$media_dbi->escape_string($cover_file) . "'";
+                }
+                try
+                {
+                    self::$media_dbi->insert($query);
+                }
+                catch (Exception $e) {
+                    debug('Caught Exception : '. $e->getMessage() . "\n");
+                }
+
             }
-            if ($cover_file !== NULL)
-            {
-                $query .= ", cover_file='" . self::$media_dbi->escape_string($cover_file) . "'";
-            }
-            self::$media_dbi->insert($query);
         }
+
+
     }
 
     // get media list from database
@@ -160,7 +172,9 @@ class mp3_lib
 
 $test_arr = array(
     // 'audio/01.七个母音.mp3',
-        'audio/富士山下.mp3',
+        // 'audio/富士山下.mp3',
+    'audio/01.天边.mp3',
+        // 'audio/02.轻轻地告诉你.mp3',
         // 'audio/对不起谢谢.mp3',
 );
 foreach ($test_arr as $value)
@@ -274,7 +288,7 @@ foreach ($test_arr as $value)
          metadata is all available in one location for all tag formats
          metainformation is always available under [tags] even if this is not called
         */
-        debug( print_r($ThisFileInfo,1));
+        // debug( print_r($ThisFileInfo,1));
        
         getid3_lib::CopyTagsToComments($ThisFileInfo);
         if (isset($ThisFileInfo['comments']) && !empty($ThisFileInfo['comments']))
