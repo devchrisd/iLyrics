@@ -8,7 +8,7 @@ else
 require_once('lib/common.php');
 require_once('lib/audio/mp3_lib.class.php');
 
-$s_id = NULL;
+$s_id = $p_id = NULL;
 if (isset($_REQUEST['s_id']) === true && empty($_REQUEST['s_id']) !== true)
     $s_id =  $_REQUEST['s_id'];
 
@@ -17,6 +17,7 @@ switch ($action) {
     case 'lib_refresh':
         $mp3_list = NULL;
         $mp3_lib = new mp3_lib();
+        debug(__METHOD__);
 
         // scan library and save to DB
         if ($action == 'lib_refresh')
@@ -27,6 +28,7 @@ switch ($action) {
         $mp3_list = $mp3_lib->get_list_from_DB();
         if ($mp3_list !== NULL && count($mp3_list) > 0)
         {
+            // debug(__METHOD__ . print_r($mp3_list,1));
             echo json_encode($mp3_list);
         }
 
@@ -106,6 +108,31 @@ switch ($action) {
         $iLyrics = new ilyrics($s_id);
         $cover = $iLyrics->get_cover();
         echo json_encode($cover);
+        break;
+
+    case 'new_playlist':
+        // add playlist record and return p_id
+        $pl_list = $p_id = NULL;
+        if (isset($_REQUEST['pl_title']) === true && empty($_REQUEST['pl_title']) !== true)
+            $pl_title =  $_REQUEST['pl_title'];
+
+        if (isset($_POST['pl_list']) === true && empty($_POST['pl_list']) !== true)
+        {
+            $pl_list = $_POST['pl_list'];
+
+            $playlist = new playlist();
+            $p_id = $playlist->new_playlist($pl_title, $pl_list);
+        }
+
+        echo json_encode($p_id);
+        break;
+
+    case 'save_playlist':
+        if (isset($_REQUEST['p_id']) === true && empty($_REQUEST['p_id']) !== true)
+            $p_id =  $_REQUEST['p_id'];
+        if ($p_id === NULL) break;
+
+        echo json_encode($p_id);
         break;
 
     default:

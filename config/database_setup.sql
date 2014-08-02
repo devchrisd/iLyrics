@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS `song` (
 
 CREATE TABLE IF NOT EXISTS `playlist` (
   `p_id` SMALLINT(5) unsigned NOT NULL auto_increment,
-  `playlist_file` varchar(256) NOT NULL DEFAULT '',
+  `title` varchar(100) NOT NULL DEFAULT '',
+  `song_list` text,
   PRIMARY KEY  (`p_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

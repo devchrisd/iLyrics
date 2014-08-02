@@ -3,6 +3,7 @@ var ele_lyrics; // element contains the lyrics
 var play_index;   // current position in playlist
 var loop;
 var controller_url = 'iLyrics_controller.php';
+var playlist_id = false;
 $(function()
 {
     $(window).load(function ()
@@ -206,6 +207,33 @@ $(function()
         return false;
     });
 
+    $('#save_playlist').on('click', function(){
+        playlist_str = build_playlist();
+        playlist_url = controller_url + "";
+
+        if(playlist_id !== false)
+        {
+            log ('save playlist ' + playlist_url);
+            $.ajax({
+                url: playlist_url,
+                type: "POST",
+                data: { action: 'save_playlist', p_id: playlist_id, pl_list: playlist_str}
+            });
+        }
+        else
+        {
+            title = get_playlist_title();
+            $.ajax({
+                url: playlist_url,
+                type: "POST",
+                data: { action: 'new_playlist', pl_title: title, pl_list: playlist_str}
+            })
+            .done (function (result)
+            {
+                playlist_id = result;
+            });
+        }
+    });
 });
 
 // Get lyrics from server
@@ -222,23 +250,17 @@ function getMp3 ()
         {
             $.each(mp3, function(i, val){
                 var pos = val.file.lastIndexOf("/");
-                // var url = "get_lyrics.php?id=" + ele_song.attr('src').substring(pos+1);
 
                 path = val.file.substr(0, pos);
                 file = val.file.substr(pos+1);
 
-                $('#filelist').append("<li><span class='add_song' s_id='" + val.s_id + "' path='" + path + "' title='click to add to playlist'>" + file + "</span><img s_id='" + val.s_id + "' class='float_right_button tag' alt='[Tag]' title='show/edit tags' /></li>");
+                $('#filelist').append("<li><span class='add_song' s_id='" + val.s_id['$id'] + "' path='" + path + "' title='click to add to playlist'>" + file + "</span><img s_id='" + val.s_id + "' class='float_right_button tag' alt='[Tag]' title='show/edit tags' /></li>");
             });
 
             // default initial action:
-            // - load first song
-            ele_song.empty()
-                    .attr('src', mp3[0]['file'])
-                    .attr('s_id', mp3[0]['s_id'])
-                    .appendTo(ele_song);
-
             // - add first song to playlist
-            $('#filelist span:first').trigger( "click" );
+            $('#filelist .add_song:first').trigger( "click" );
+            // - load first song
             $('.play_song:first()').trigger('click');
         }
     });

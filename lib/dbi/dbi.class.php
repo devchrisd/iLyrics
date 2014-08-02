@@ -348,7 +348,7 @@ Abstract class dbi_class
     */
    function escape_string($string)
    {
-        return false;
+        return $string;
    }
 
    /**

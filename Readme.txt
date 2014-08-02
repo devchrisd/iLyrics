@@ -16,7 +16,7 @@ Testing Environment:
  MAMP
  - Mac OSX 10.9.3
  - Apache 2.2.26
- - MySQL 5.6.16
+ - MongoDB 2.6.3
  - PHP 5.4.24,
  - getID3 from https://github.com/JamesHeinrich/getID3
  // *REMOVED* - PEAR/PECL with ID3 installed
@@ -40,13 +40,8 @@ SETUP:
 
 - Apache or the webserver user/group must have permission to create/modify file in lyric/, audio/, and image/cover. Use command:
     sudo chown www:www [dir]
-- Build up database with sql script in config/database_setup.sql
-- create user 'developer' in mysql:
-	mysql> create user 'developer'@'localhost' identified by 'ppp';
-	mysql> grant all on media.* to 'developer'@'localhost';
-	mysql> flush privileges;
 
-- Run [sitename_iLyrics]/iLyrics_controller.php?action=lib_refresh to scan the audio / lyrics and cover folder to setup database
+- Run [sitename_iLyrics]/iLyrics_controller.php?action=lib_refresh to scan folder audio / lyrics and cover to initial setup database
 
 
 

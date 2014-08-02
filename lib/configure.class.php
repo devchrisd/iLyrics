@@ -5,6 +5,7 @@ class Configure
 {
     const SEARCH_URL    = 'http://geci.me/api/';
     const LYRICS_PATH   = 'lyric/';
+    const PLAYLIST_PATH = 'playlist/';
     const COVER_PATH    = 'images/cover/';
     const AUDIO_PATH    = 'audio/';
 

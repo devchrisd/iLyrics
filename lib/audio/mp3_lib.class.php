@@ -1,7 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__) . '/../getid3/getid3.php');
-require_once(dirname(__FILE__) . '/../dbi/mysql_driver.class.php');
+require_once(dirname(__FILE__) . '/../dbi/mongo_driver.class.php');
 
 class mp3_lib
 {
@@ -66,7 +66,7 @@ class mp3_lib
         if (self::$media_dbi === NULL)
         {
             // debug(print_r(debug_backtrace(),1));
-            self::$media_dbi = new mysql_interface_class(Configure::HOST, Configure::USER, Configure::PASSWD, Configure::MEDIA_DB);
+            self::$media_dbi = new mongo_interface_class(Configure::HOST, Configure::USER, Configure::PASSWD, Configure::MEDIA_DB);
         }
     }
 
@@ -82,11 +82,9 @@ class mp3_lib
 
         if (self::$media_dbi->connect())
         {
-        // delete current data 
-            $query = 'DELETE FROM ' . Configure::MEDIA_DB . '.song';
-            self::$media_dbi->update($query);
-            $query = 'ALTER TABLE ' . Configure::MEDIA_DB . '.song AUTO_INCREMENT=0';
-            self::$media_dbi->update($query);
+            $collection = 'song';
+            // delete current data
+            self::$media_dbi->remove(Configure::MEDIA_DB, 'song');
 
             // save each file info into database
             foreach ($this->mp3_arr as $key => $value)
@@ -118,25 +116,25 @@ class mp3_lib
                     }
                 }
 
-                $query = 'REPLACE INTO ' . Configure::MEDIA_DB . '.song'
-                        . " SET song_file='" . self::$media_dbi->escape_string($value) . "',"
-                        . " title='" . self::$media_dbi->escape_string($title) . "',"
-                        . " artist='" . self::$media_dbi->escape_string($artist) . "',"
-                        . " album='" . self::$media_dbi->escape_string($album) . "',"
-                        . " year='" . self::$media_dbi->escape_string($year) . "',"
-                        . " genre='" . self::$media_dbi->escape_string($genre) . "'"
-                        ;
+                $song_arr = array(
+                        'song_file' => self::$media_dbi->escape_string($value),
+                        'title'     => self::$media_dbi->escape_string($title),
+                        'artist'    => self::$media_dbi->escape_string($artist),
+                        'album'     => self::$media_dbi->escape_string($album),
+                        'year'      => self::$media_dbi->escape_string($year),
+                        'genre'     => self::$media_dbi->escape_string($genre),
+                        );
                 if ($lyrics_file !== NULL)
                 {
-                    $query .= ", lyrics_file='" . self::$media_dbi->escape_string($lyrics_file) . "'";
+                    $song_arr['lyrics_file'] = self::$media_dbi->escape_string($lyrics_file);
                 }
                 if ($cover_file !== NULL)
                 {
-                    $query .= ", cover_file='" . self::$media_dbi->escape_string($cover_file) . "'";
+                    $song_arr['cover_file'] = self::$media_dbi->escape_string($cover_file);
                 }
                 try
                 {
-                    self::$media_dbi->insert($query);
+                    self::$media_dbi->insert(Configure::MEDIA_DB, $collection, $song_arr);
                 }
                 catch (Exception $e) {
                     debug('Caught Exception : '. $e->getMessage() . "\n");
@@ -157,28 +155,30 @@ class mp3_lib
 
         if (self::$media_dbi->connect())
         {
+            $collection = 'song';
+
             // self::$media_dbi->select_db(Configure::MEDIA_DB);
-            $query = 'SELECT s_id, song_file, title from ' . Configure::MEDIA_DB . '.song order by s_id;';
-            if ($result = self::$media_dbi->select($query) )
+            $return_fields = array('_id', 'song_file', 'title'); // order by s_id;';
+            if ($result = self::$media_dbi->select(Configure::MEDIA_DB, $collection, $return_fields) )
             {
-                while( $row = self::$media_dbi->fetch_row_assoc($result))
+                foreach ($result as $row)
                 {
-                    $list[$index]['s_id'] = $row['s_id'];
+                    $list[$index]['s_id'] = $row['_id'];
                     $list[$index]['title'] = $row['title'];
                     $list[$index++]['file'] = $row['song_file'];
                 }
             }
         }
 
-// $test_arr = array(
-//     // 'audio/01.七个母音.mp3',
-//         // 'audio/富士山下.mp3',
-//     'audio/01.天边.mp3',
-//         // 'audio/02.轻轻地告诉你.mp3',
-//         // 'audio/对不起谢谢.mp3',
-// );
-// foreach ($test_arr as $value)
-//         self::get_ID3($value);
+$test_arr = array(
+    // 'audio/01.七个母音.mp3',
+        // 'audio/富士山下.mp3',
+    'audio/01.天边.mp3',
+        // 'audio/02.轻轻地告诉你.mp3',
+        // 'audio/对不起谢谢.mp3',
+);
+foreach ($test_arr as $value)
+        self::get_ID3($value);
         return $list;
     }
 
@@ -188,11 +188,13 @@ class mp3_lib
 
         if (self::$media_dbi->connect())
         {
-            // self::$media_dbi->select_db(Configure::MEDIA_DB);
-            $query = 'select * from ' . Configure::MEDIA_DB . '.song WHERE s_id="' . $s_id .'"';
-            if ($result = self::$media_dbi->select($query) )
+            $collection = 'song';
+
+            $return_fields = array();
+            $query_fields = array( '_id' => new MongoId($s_id) );
+            if ($result = self::$media_dbi->select(Configure::MEDIA_DB, $collection, $return_fields, $query_fields) )
             {
-                if ( $row = self::$media_dbi->fetch_row_assoc($result))
+                foreach ($result as $row)
                 {
                     return $row;
                 }
@@ -217,8 +219,7 @@ class mp3_lib
 
         if (self::$media_dbi->connect())
         {
-            // self::$media_dbi->select_db(Configure::MEDIA_DB);
-            $query = 'UPDATE ' . Configure::MEDIA_DB . '.song SET ';
+            $collection = 'song';
 
             $ID3_key = array(
                         'title',
@@ -228,21 +229,18 @@ class mp3_lib
                         'genre',
                         );
 
+            $data_arr = array();
             foreach($ID3_key as $key)
             {
                 if (empty($$key) === FALSE)
                 {
-                    $query .= $key . '="' . self::$media_dbi->escape_string($$key) . '",';
+                    $data_arr[$key] = self::$media_dbi->escape_string($$key);
                     $TagData[strtolower($key)][] = $$key;
                 }
             }
 
-            if ($TagData !== NULL && count($TagData) > 0)
-            {
-                $query = rtrim($query, ",");
-            }
-            $query .= ' WHERE s_id="' . $s_id .'"';
-            $result = self::$media_dbi->update($query);
+            $query_fields = array( '_id' => new MongoId( $s_id ) );
+            $result = self::$media_dbi->update(Configure::MEDIA_DB, $collection, $query_fields, $data_arr);
         }
 
         // update id3
@@ -320,25 +318,34 @@ class mp3_lib
 
         self::__get_dbi();
         $query = '';
+        $collection = 'song';
         switch ($field)
         {
             case Configure::FIELD_COVER:
                 // update all records of (album, artist)
                 // 
-                $query_select = 'SELECT album, artist FROM ' . Configure::MEDIA_DB . '.song WHERE s_id="' . self::$media_dbi->escape_string($s_id) . '"';
-                if ($result_select = self::$media_dbi->select($query_select) )
+                $return_fields = array('album', 'artist');
+                $query_fields = array('_id' => new MongoId( $s_id));
+
+                if ($result_select = self::$media_dbi->select(Configure::MEDIA_DB, $collection, $query_select, $return_fields) )
                 {
-                    if ( $row_select = self::$media_dbi->fetch_row_assoc($result_select))
+                    foreach ( $result_select as $row_select)
                     {
                         $album  = $row_select['album'];
                         $artist = $row_select['artist'];
                     }
                 }
 
-                $query = 'UPDATE ' . Configure::MEDIA_DB . '.song set cover_file="' . self::$media_dbi->escape_string($data) . '" WHERE album="' . self::$media_dbi->escape_string($album) . '" AND artist="' . self::$media_dbi->escape_string($artist) . '"';
+                $query_fields = array(
+                                     'album' => self::$media_dbi->escape_string($album),
+                                     'artist'=> self::$media_dbi->escape_string($artist)
+                                    );
+                $data_arr = array( 'cover_file' => self::$media_dbi->escape_string($data));
+
                 break;
             case Configure::FIELD_LYRICS:
-                $query = 'UPDATE ' . Configure::MEDIA_DB . '.song set lyrics_file="' . self::$media_dbi->escape_string($data) . '" WHERE s_id=' . self::$media_dbi->escape_string($s_id);
+                $query_fields = array('_id' => new MongoId($s_id));
+                $data_arr = array('lyrics_file' => self::$media_dbi->escape_string($data) );
                 break;
             default:
                 break;
@@ -346,7 +353,7 @@ class mp3_lib
         if (empty($query) === FALSE)
         {
             // update database
-            $ret = self::$media_dbi->update($query);
+            $ret = self::$media_dbi->update(Configure::MEDIA_DB, $collection, $query_fields, $data_arr);
         }
 
         return $ret;
@@ -357,12 +364,13 @@ class mp3_lib
         if ($s_id)
         {
             self::__get_dbi();
-            $query = 'SELECT cover_file FROM ' . Configure::MEDIA_DB . '.song WHERE s_id="' . self::$media_dbi->escape_string($s_id) . '"';
+            $collection = 'song';
+            $return_fields = array('cover_file');
+            $query_fields = array('_id' => new MongoId( self::$media_dbi->escape_string($s_id) ));
 
-            if ($result = self::$media_dbi->select($query) )
+            if ($result = self::$media_dbi->select(Configure::MEDIA_DB, $collection, $query_select, $return_fields) )
             {
-                if ( $row = self::$media_dbi->fetch_row_assoc($result))
-                {
+                foreach ($result as $row) {
                     return $row['cover_file'];
                 }
             }
