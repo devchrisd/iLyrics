@@ -90,8 +90,9 @@ $(function()
         {
             if(tag)
             {
+            log(tag);
                 $('#div-tag').html("<span class='float_right_button'>X</span><ul id='ul-tag'></ul><form id='form-tag' method='post' action='#'> </form>");
-                $('#form-tag').append("<input type='hidden' name='tag_s_id' id='tag_s_id' value='" + tag['s_id'] + "' />");
+                $('#form-tag').append("<input type='hidden' name='tag_s_id' id='tag_s_id' value='" + tag['_id']['$id'] + "' />");
 
                 // show tag
                 $.each(tag, function(key, val){
@@ -254,7 +255,7 @@ function getMp3 ()
                 path = val.file.substr(0, pos);
                 file = val.file.substr(pos+1);
 
-                $('#filelist').append("<li><span class='add_song' s_id='" + val.s_id['$id'] + "' path='" + path + "' title='click to add to playlist'>" + file + "</span><img s_id='" + val.s_id + "' class='float_right_button tag' alt='[Tag]' title='show/edit tags' /></li>");
+                $('#filelist').append("<li><span class='add_song' s_id='" + val.s_id['$id'] + "' path='" + path + "' title='click to add to playlist'>" + file + "</span><img s_id='" + val.s_id['$id'] + "' class='float_right_button tag' alt='[Tag]' title='show/edit tags' /></li>");
             });
 
             // default initial action:

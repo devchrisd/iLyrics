@@ -327,7 +327,7 @@ foreach ($test_arr as $value)
                 $return_fields = array('album', 'artist');
                 $query_fields = array('_id' => new MongoId( $s_id));
 
-                if ($result_select = self::$media_dbi->select(Configure::MEDIA_DB, $collection, $query_select, $return_fields) )
+                if ($result_select = self::$media_dbi->select(Configure::MEDIA_DB, $collection, $return_fields, $query_select) )
                 {
                     foreach ( $result_select as $row_select)
                     {
@@ -368,7 +368,7 @@ foreach ($test_arr as $value)
             $return_fields = array('cover_file');
             $query_fields = array('_id' => new MongoId( self::$media_dbi->escape_string($s_id) ));
 
-            if ($result = self::$media_dbi->select(Configure::MEDIA_DB, $collection, $query_select, $return_fields) )
+            if ($result = self::$media_dbi->select(Configure::MEDIA_DB, $collection, $return_fields, $query_fields) )
             {
                 foreach ($result as $row) {
                     return $row['cover_file'];
