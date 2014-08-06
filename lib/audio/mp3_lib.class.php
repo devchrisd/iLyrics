@@ -26,7 +26,7 @@ class mp3_lib
                 $file = ((empty($dir)) ? '' : $dir) . $file;
                 if ( is_dir($file) !== true && $this->is_mp3($file) )
                 {
-                    debug(__METHOD__ . ' file: ' . $file);
+                    // debug(__METHOD__ . ' file: ' . $file);
                     $this->mp3_arr[] = $file;
                 }
                 elseif (is_dir($file) === true)
@@ -84,12 +84,15 @@ class mp3_lib
         {
             $collection = 'song';
             // delete current data
-            self::$media_dbi->remove(Configure::MEDIA_DB, 'song');
+            self::$media_dbi->drop(
+            // self::$media_dbi->remove(
+                                Configure::MEDIA_DB, 
+                                'song'
+                                );
 
             // save each file info into database
             foreach ($this->mp3_arr as $key => $value)
             {
-                //$iLyrics = new ilyrics(basename($value));
                 $title = $artist = $album = $year = $genre = '';
                 // get id3
                 $id3 = $this->get_ID3($value);
@@ -132,9 +135,14 @@ class mp3_lib
                 {
                     $song_arr['cover_file'] = self::$media_dbi->escape_string($cover_file);
                 }
+
                 try
                 {
-                    self::$media_dbi->insert(Configure::MEDIA_DB, $collection, $song_arr);
+                    self::$media_dbi->insert(
+                                        Configure::MEDIA_DB, 
+                                        $collection, 
+                                        $song_arr
+                                        );
                 }
                 catch (Exception $e) {
                     debug('Caught Exception : '. $e->getMessage() . "\n");
@@ -159,7 +167,12 @@ class mp3_lib
 
             // self::$media_dbi->select_db(Configure::MEDIA_DB);
             $return_fields = array('_id', 'song_file', 'title'); // order by s_id;';
-            if ($result = self::$media_dbi->select(Configure::MEDIA_DB, $collection, $return_fields) )
+            if ($result = self::$media_dbi->select(
+                                                Configure::MEDIA_DB, 
+                                                $collection, 
+                                                $return_fields
+                                                )
+                )
             {
                 foreach ($result as $row)
                 {
@@ -169,7 +182,7 @@ class mp3_lib
                 }
             }
         }
-
+/*
 $test_arr = array(
     // 'audio/01.七个母音.mp3',
         // 'audio/富士山下.mp3',
@@ -177,8 +190,8 @@ $test_arr = array(
         // 'audio/02.轻轻地告诉你.mp3',
         // 'audio/对不起谢谢.mp3',
 );
-foreach ($test_arr as $value)
-        self::get_ID3($value);
+foreach ($test_arr as $value) self::get_ID3($value);
+*/
         return $list;
     }
 
@@ -192,7 +205,14 @@ foreach ($test_arr as $value)
 
             $return_fields = array();
             $query_fields = array( '_id' => new MongoId($s_id) );
-            if ($result = self::$media_dbi->select(Configure::MEDIA_DB, $collection, $return_fields, $query_fields) )
+            // :TODO: use findOne()
+            if ($result = self::$media_dbi->select(
+                                                Configure::MEDIA_DB, 
+                                                $collection, 
+                                                $return_fields, 
+                                                $query_fields
+                                                )
+                )
             {
                 foreach ($result as $row)
                 {
@@ -240,7 +260,12 @@ foreach ($test_arr as $value)
             }
 
             $query_fields = array( '_id' => new MongoId( $s_id ) );
-            $result = self::$media_dbi->update(Configure::MEDIA_DB, $collection, $query_fields, $data_arr);
+            $result = self::$media_dbi->update(
+                                            Configure::MEDIA_DB, 
+                                            $collection, 
+                                            $query_fields, 
+                                            $data_arr
+                                        );
         }
 
         // update id3
@@ -317,7 +342,7 @@ foreach ($test_arr as $value)
         $ret = FALSE;
 
         self::__get_dbi();
-        $query = '';
+        $update_arr = '';
         $collection = 'song';
         switch ($field)
         {
@@ -327,7 +352,14 @@ foreach ($test_arr as $value)
                 $return_fields = array('album', 'artist');
                 $query_fields = array('_id' => new MongoId( $s_id));
 
-                if ($result_select = self::$media_dbi->select(Configure::MEDIA_DB, $collection, $return_fields, $query_select) )
+                // :TODO: use findOne()
+                if ($result_select = self::$media_dbi->select(
+                                                        Configure::MEDIA_DB, 
+                                                        $collection, 
+                                                        $return_fields, 
+                                                        $query_select
+                                                        )
+                    )
                 {
                     foreach ( $result_select as $row_select)
                     {
@@ -340,20 +372,25 @@ foreach ($test_arr as $value)
                                      'album' => self::$media_dbi->escape_string($album),
                                      'artist'=> self::$media_dbi->escape_string($artist)
                                     );
-                $data_arr = array( 'cover_file' => self::$media_dbi->escape_string($data));
+                $update_arr = array( 'cover_file' => self::$media_dbi->escape_string($data));
 
                 break;
             case Configure::FIELD_LYRICS:
                 $query_fields = array('_id' => new MongoId($s_id));
-                $data_arr = array('lyrics_file' => self::$media_dbi->escape_string($data) );
+                $update_arr = array('lyrics_file' => self::$media_dbi->escape_string($data) );
                 break;
             default:
                 break;
         }
-        if (empty($query) === FALSE)
+        if (empty($update_arr) === FALSE)
         {
             // update database
-            $ret = self::$media_dbi->update(Configure::MEDIA_DB, $collection, $query_fields, $data_arr);
+            $ret = self::$media_dbi->update(
+                                        Configure::MEDIA_DB, 
+                                        $collection, 
+                                        $query_fields, 
+                                        $update_arr
+                                        );
         }
 
         return $ret;
@@ -368,9 +405,16 @@ foreach ($test_arr as $value)
             $return_fields = array('cover_file');
             $query_fields = array('_id' => new MongoId( self::$media_dbi->escape_string($s_id) ));
 
-            if ($result = self::$media_dbi->select(Configure::MEDIA_DB, $collection, $return_fields, $query_fields) )
+            if ($result = self::$media_dbi->select(
+                                                Configure::MEDIA_DB, 
+                                                $collection, 
+                                                $return_fields, 
+                                                $query_fields
+                                            )
+                )
             {
-                foreach ($result as $row) {
+                foreach ($result as $row)
+                {
                     return $row['cover_file'];
                 }
             }

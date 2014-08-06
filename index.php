@@ -8,7 +8,8 @@
 
     <script language = "javascript" src="script/iLyrics.js"></script>
     <script language = "javascript" src="script/lrc.js"></script>
-    
+    <script language = "javascript" src="script/mobile_api.js"></script>
+
     <link rel="stylesheet" type="text/css" href="css/common.css">
     <link rel="stylesheet" type="text/css" href="css/lyrics.css">
 </head>

@@ -14,8 +14,6 @@ class mongo_interface_class extends dbi_class
         if ($this->connection === FALSE)
         {
             $this->connection = new Mongo();
-                    debug(__METHOD__ . ' : new connection.');
-
         }
         return $this->connection;
     }
@@ -30,6 +28,13 @@ class mongo_interface_class extends dbi_class
     {
         $this->select_db($db);
         $dataset = $this->database->$collection->find($query_arr, $return_fields);
+        return $dataset;
+    }
+
+    function selectOne($db, $collection, $return_fields=array(), $query_arr=array())
+    {
+        $this->select_db($db);
+        $dataset = $this->database->$collection->findOne($query_arr, $return_fields);
         return $dataset;
     }
 
@@ -58,7 +63,12 @@ class mongo_interface_class extends dbi_class
     {
          $this->select_db($db);
          $this->database->$collection->remove($query_arr);
-                 debug(__METHOD__ );
 
+    }
+
+    function drop($db, $collection)
+    {
+         $this->select_db($db);
+         $this->database->$collection->drop();
     }
 }
