@@ -1,16 +1,14 @@
 var ele_song;   // element contains the song
 var ele_lyrics; // element contains the lyrics
-var play_index;   // current position in playlist
-var loop;
 var controller_url = 'iLyrics_controller.php';
-var playlist_id = false;
 $(function()
 {
+    var loop;
     $(window).load(function ()
     {
-        ele_song    = $('#player');
-        ele_lyrics  = $('#lyrics');
-        loop        = true;
+        ele_song   = $('#player');
+        ele_lyrics = $('#lyrics');
+        loop       = true;
         $('#loop_status').text('On');
         // ele_song.draggable();
         // ele_lyrics.draggable();
@@ -31,9 +29,9 @@ $(function()
     $(document).on('click', '.add_song', function(){
         // add to playlist
         $('#playlist').append(
-                                "<li><span class='play_song' s_id='" + $(this).attr('s_id') + "' path='" + $(this).attr('path') + "' title='click to play'>" + $(this).text() + 
-                                "</span><img class='float_right_button remove' alt='[X]' title='remove from list' /></li>"
-                            );
+                            "<li><span class='play_song' s_id='" + $(this).attr('s_id') + "' path='" + $(this).attr('path') + "' title='click to play'>" + $(this).text() + 
+                            "</span><img class='float_right_button remove' alt='[X]' title='remove from list' /></li>"
+                        );
     });
 
     // remove from list
@@ -45,7 +43,8 @@ $(function()
             return;
         }
 
-        $(this).parent().detach();
+        //.detach(): This method is the same as .remove(), except that .detach() keeps all jQuery data associated with the removed elements. This method is useful when removed elements are to be reinserted into the DOM at a later time.
+        $(this).parent().remove();  // detach();
     });
 
     $(document).on('click', '.play_song', function(){
@@ -70,7 +69,6 @@ $(function()
     });
 
     var tag_arr = ['title', 'artist', 'album', 'year', 'genre'];
-
     $(document).on('click', '.tag', function(){
         // pop up tag info
         var url = controller_url + "?s_id=" + $(this).attr('s_id') + '&action=get_tag';
@@ -135,23 +133,40 @@ $(function()
         year   = $('#form-tag #year').val();
         genre  = $('#form-tag #genre').val();
 
-        url += '&s_id=' + $('#tag_s_id').val() + '&title=' + title + '&artist=' + artist + '&album=' + album + '&year=' + year + '&genre=' + genre;
+        data = {
+            s_id:   $('#tag_s_id').val(),
+            title:  title,
+            artist: artist,
+            album:  album,
+            year:   year,
+            genre:  genre
+        };
         // log ('save tag ' + url);
-        $.ajax(url)
-        .done( function(data)
-        {
-            $('#div-tag>.float_right_button').click();
+        $.post(
+            url,
+            data,
+            function(){
+                $('#div-tag>.float_right_button').click();
         });
+
+        // url += '&s_id=' + $('#tag_s_id').val() + '&title=' + title + '&artist=' + artist + '&album=' + album + '&year=' + year + '&genre=' + genre;
+        // $.ajax(url)
+        // .done( function(data)
+        // {
+        //     $('#div-tag>.float_right_button').click();
+        // });
 
         return false;
     });
 
     // play next song in playlist
     $('#player').on('ended', function(){
-        play_index = $('.current_song').index('.play_song');
-        play_list_len = $('.play_song').length - 1;
+        var play_index; // current position in playlist
 
-        next_play = false;
+        play_index    = $('.current_song').index('.play_song');
+        play_list_len = $('.play_song').length - 1;
+        next_play     = false;
+
         if ( play_list_len > 0 && play_index < play_list_len)
         {
             next_play = play_index+1;
@@ -208,6 +223,7 @@ $(function()
         return false;
     });
 
+    var playlist_id = false;
     $('#save_playlist').on('click', function(){
         playlist_str = build_playlist();
         playlist_url = controller_url + "";
@@ -340,16 +356,20 @@ function setLyrics(lyrics)
 
 function setCover(cover)
 {
-    if (cover && cover.length > 0)
-    {
-        // show cover
-        $('#artist_avatar').attr('src', cover);
-    }
-    else
-    {
-        // replace with default
-        $('#artist_avatar').attr('src', 'images/default.jpg');
-    }
+    $('#artist_avatar').fadeOut('slow',
+        function(){
+            if (cover && cover.length > 0)
+            {
+                // show cover
+                $('#artist_avatar').attr('src', cover);
+            }
+            else
+            {
+                // replace with default
+                $('#artist_avatar').attr('src', 'images/default.jpg');
+            }
+        });
+    $('#artist_avatar').fadeIn('slow');
 }
 function getCover(s_id)
 {

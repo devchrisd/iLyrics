@@ -76,20 +76,20 @@ switch ($action) {
 
         $title = $artist = $album = $year = $genre = '';
 
-        if (isset($_GET['title']) === true && empty($_GET['title']) !== true)
-            $title =  $_GET['title'];
+        if (isset($_POST['title']) === true && empty($_POST['title']) !== true)
+            $title =  $_POST['title'];
 
-        if (isset($_GET['artist']) === true && empty($_GET['artist']) !== true)
-            $artist =  $_GET['artist'];
+        if (isset($_POST['artist']) === true && empty($_POST['artist']) !== true)
+            $artist =  $_POST['artist'];
 
-        if (isset($_GET['album']) === true && empty($_GET['album']) !== true)
-            $album =  $_GET['album'];
+        if (isset($_POST['album']) === true && empty($_POST['album']) !== true)
+            $album =  $_POST['album'];
 
-        if (isset($_GET['year']) === true && empty($_GET['year']) !== true)
-            $year =  $_GET['year'];
+        if (isset($_POST['year']) === true && empty($_POST['year']) !== true)
+            $year =  $_POST['year'];
 
-        if (isset($_GET['genre']) === true && empty($_GET['genre']) !== true)
-            $genre =  $_GET['genre'];
+        if (isset($_POST['genre']) === true && empty($_POST['genre']) !== true)
+            $genre =  $_POST['genre'];
 
         $result = mp3_lib::set_song_id3(
                     $s_id,

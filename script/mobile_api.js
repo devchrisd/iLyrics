@@ -1,6 +1,5 @@
 if (window.navigator && window.navigator.battery) {
    // API supported
-
    var battery = navigator.battery || navigator.webkitBattery || navigator.mozBattery || navigator.msBattery;
 
    // Print if battery is charging or not
@@ -9,7 +8,6 @@ if (window.navigator && window.navigator.battery) {
 
     var enableEffects = (battery.charging || battery.level > 0.25);
 
-    // vibrate for one second
     if (enableEffects)
     {
         console.log( "Battery power is OK." );
@@ -42,7 +40,7 @@ if (window.navigator && window.navigator.battery) {
                         notification[eventName] = function(event)
                             {
                                 console.log( 'Event "' + event.type + '" triggered for notification "' + notification.tag );
-                            }; 
+                            };
                     });
             });
 
@@ -59,7 +57,7 @@ if (window.navigator && window.navigator.battery) {
 
 
 if (window.navigator && window.navigator.vibrate) {
-   // API supported
+    // vibrate for one second
     navigator.vibrate(1000);
     console.log('vibrate supported.');
 } else {

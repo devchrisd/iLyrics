@@ -258,7 +258,6 @@ foreach ($test_arr as $value) self::get_ID3($value);
                     $TagData[strtolower($key)][] = $$key;
                 }
             }
-
             $query_fields = array( '_id' => new MongoId( $s_id ) );
             $result = self::$media_dbi->update(
                                             Configure::MEDIA_DB, 

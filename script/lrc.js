@@ -2,21 +2,21 @@
 // object to show KaraOK style lyrics
 var lrc = {
 
-    init: true, // first time show this lyrics
-    offset: 0,  // time offset from lrc file
-    islrc: true,  // song has lrc style lyrics
+    init:   true, // first time show this lyrics
+    offset: 0,    // time offset from lrc file
+    islrc:  true, // song has lrc style lyrics
 
-    elementSong: null,
+    elementSong:   null,
     elementLyrics: null,
 
-    scrollh: 0,
+    scrollh:        0,
     scrollInterval: 10,
 
-    index: 0,   // for lytext and lytime
+    index:       0,     // for lytext and lytime
     currentLine: 0,     // lyrics line number of the current position
     lytext: new Array(),// lyrics text
     lytime: new Array(),// lyrics time
-    lyricsPlayTimeout: null,
+    lyricsPlayTimeout:   null,
     lyricsScrollTimeout: null,
 
     reset: function()
@@ -24,8 +24,8 @@ var lrc = {
         this.init       = true;
         this.offset     = 0;
         this.index      = 0;
-        this.lytext     = new Array();// lyrics text
-        this.lytime     = new Array();// lyrics time
+        this.lytext     = new Array(); // lyrics text
+        this.lytime     = new Array(); // lyrics time
         this.currentLine= 0;
         this.scrollh    = 0;
         this.islrc      = true;
@@ -40,7 +40,7 @@ var lrc = {
 
     setLyrics: function(ele_lyrics, lrc_lyrics)
     {
-        this.elementLyrics  = ele_lyrics;
+        this.elementLyrics = ele_lyrics;
         this.reset();
         this.elementLyrics.append(lrc_lyrics);
     },
@@ -86,9 +86,9 @@ var lrc = {
             return;
         }
 
-        line_height = this.elementLyrics.css('line-height');
+        line_height  = this.elementLyrics.css('line-height');
         // remove 'px' from string, get the digits only
-        line_height = parseInt(line_height.substring(0, line_height.lastIndexOf('p')));
+        line_height  = parseInt(line_height.substring(0, line_height.lastIndexOf('p')));
         this.scrollh = this.currentLine * (line_height); // amount to scroll top. line-height:25px;
         if (this.elementLyrics.scrollTop() <= this.scrollh)
         {
@@ -115,8 +115,8 @@ var lrc = {
             if (offset_line[0].length > 0)
             {
                 var sign = offset_line[0].match(/\+|\-/);
-                offset = offset_line[0].match(/\d+/g);
-                offset /= 100;
+                offset   = offset_line[0].match(/\d+/g);
+                offset   /= 100;
                 if (sign == '-')
                     offset *= -1;
                 log ("offset: " + offset);
@@ -148,10 +148,10 @@ var lrc = {
         {
             // the lyrics is not lrc-formatted
             this.lytext[this.index++] = '';
-            this.lytime[this.index] = 0;
+            this.lytime[this.index]   = 0;
             this.lytext[this.index++] = data.replace(/\r\n|\n/g, '<br>');
-            this.lytime[this.index] = 1;
-            this.islrc = false;
+            this.lytime[this.index]   = 1;
+            this.islrc                = false;
             return true;
         }
 
@@ -166,7 +166,7 @@ var lrc = {
 
             // get text only lyrics
             // l_ww = arr_lyrics[i].replace(/[\s+]/ig,'').replace(/n{1,}/ig,'');
-            pos = arr_lyrics[i].lastIndexOf("]") + 1;
+            pos  = arr_lyrics[i].lastIndexOf("]") + 1;
             l_ww = arr_lyrics[i].substring(pos);
 
             // fill time sequence to array this.lytime,
@@ -176,7 +176,7 @@ var lrc = {
             {
                 // remove '[' and ']'
                 l_time[ii] = l_time[ii].replace(/\[/,'').replace(/\]/,'');
-                sec = this.convert2Seconds(l_time[ii]);
+                sec        = this.convert2Seconds(l_time[ii]);
 
                 this.lytext[this.index] = l_ww;
                 this.lytime[this.index] = sec + this.offset;
@@ -199,10 +199,10 @@ var lrc = {
             {
                 if(this.lytime[j] > this.lytime[j+1])
                 {
-                    temp = this.lytime[j];
+                    temp  = this.lytime[j];
                     temp1 = this.lytext[j];
-                    this.lytime[j] = this.lytime[j+1];
-                    this.lytext[j] = this.lytext[j+1];
+                    this.lytime[j]   = this.lytime[j+1];
+                    this.lytext[j]   = this.lytext[j+1];
                     this.lytime[j+1] = temp;
                     this.lytext[j+1] = temp1;
                 }
@@ -315,3 +315,4 @@ var lrc = {
     }
 
 }
+
