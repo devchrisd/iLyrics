@@ -5,50 +5,50 @@ require_once(dirname(__FILE__) . '/../curl.class.php');
 require_once('mp3_lib.class.php');
 
     /*
-    
+
         http://geci.me/api/lyric/SongName
         http://geci.me/api/lyric/SongName/Artist
 
         Return:
         {
-            "count": 2, 
-            "code": 0, 
-            "result": 
+            "count": 2,
+            "code": 0,
+            "result":
             [
                 {
-                    "aid": 3280385, 
-                    "artist_id": 30883, 
-                    "song": "\u6625\u5929\u91cc", 
-                    "lrc": "http://s.geci.me/lrc/401/40183/4018355.lrc", 
+                    "aid": 3280385,
+                    "artist_id": 30883,
+                    "song": "\u6625\u5929\u91cc",
+                    "lrc": "http://s.geci.me/lrc/401/40183/4018355.lrc",
                     "sid": 4018355
-                }, 
+                },
                 {
-                    "aid": 3288629, 
-                    "artist_id": 30883, 
-                    "song": "\u6625\u5929\u91cc", 
-                    "lrc": "http://s.geci.me/lrc/402/40282/4028293.lrc", 
+                    "aid": 3288629,
+                    "artist_id": 30883,
+                    "song": "\u6625\u5929\u91cc",
+                    "lrc": "http://s.geci.me/lrc/402/40282/4028293.lrc",
                     "sid": 4028293
                 }
             ]
-        }   
+        }
     接口返回值类型
     json
-    
-        count 
+
+        count
         查询到的歌词数量。
-        code 
+        code
         不详，猜测可能是查询状态码，正常为0。
-        result 
+        result
         查询到的歌词条目列表。
-        aid 
+        aid
         专辑编号。
-        lrc 
+        lrc
         歌词下载链接。
-        artist 
+        artist
         艺术家姓名。
-        song 
+        song
         歌曲名称。
-        sid 
+        sid
         歌曲编号。
 
 
@@ -56,10 +56,10 @@ require_once('mp3_lib.class.php');
         http://geci.me/api/cover/AlbumId
         Return:
         {
-            "count": 1, 
-            "code": 0, 
+            "count": 1,
+            "code": 0,
             "result": {
-                "cover": "http://s.geci.me/album-cover/328/3288629.jpg", 
+                "cover": "http://s.geci.me/album-cover/328/3288629.jpg",
                 "thumb": "http://s.geci.me/album-cover/328/3288629-thumb.jpg"
                 }
         }
@@ -130,7 +130,7 @@ class ilyrics
         }
 
         if (
-                $this->lyrics_files === NULL || 
+                $this->lyrics_files === NULL ||
                 $this->cover_file === NULL
             )
         {
@@ -172,6 +172,7 @@ class ilyrics
     function fetch()
     {
         $result = $this->is_lyrics_local();
+
         if ($result !== FALSE)
         {
             debug( "get file " . $this->lyrics_files[0]);
@@ -199,6 +200,7 @@ class ilyrics
         if (count($this->lyrics_files) == 0)
         {
             debug('no lyrics_files provided.');
+
             return FALSE;
         }
 
@@ -297,7 +299,7 @@ class ilyrics
                 debug('online result_arr: ' . print_r($result_arr,1));
 
                 if (
-                    is_array($result_arr) === TRUE && 
+                    is_array($result_arr) === TRUE &&
                     isset($result_arr['count']) &&
                     $result_arr['count'] > 0 &&
                     count($result_arr['result']) > 0
@@ -326,7 +328,7 @@ class ilyrics
                             if (
                                     (
                                         isset($this->song_info['cover_file']) === FALSE ||
-                                        empty($this->song_info['cover_file']) === TRUE 
+                                        empty($this->song_info['cover_file']) === TRUE
                                     )
                                     &&
                                     isset($lrc_arr['aid']) === TRUE

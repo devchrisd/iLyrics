@@ -16,10 +16,10 @@ class curl_out
 
     function set_para($url, $request='', $curl_send='get')
     {
-        $this->url       = $url;
-        $this->curl_send = $curl_send;
-        $this->post_data = $request;
-        $this->response  = false;
+        $this->url                = $url;
+        $this->curl_send          = $curl_send;
+        $this->post_data          = $request;
+        $this->response           = false;
         $this->response_meta_info = null;
     }
 
@@ -27,19 +27,19 @@ class curl_out
     {
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_TIMEOUT,           120);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT,    60);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER,    1);
+        curl_setopt($ch, CURLOPT_TIMEOUT,        120);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 60);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
         if ($this->curl_send == 'post')
         {
-            curl_setopt($ch, CURLOPT_POST,              1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS,        $this->post_data);
+            curl_setopt($ch, CURLOPT_POST,       1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $this->post_data);
         }
 
-        curl_setopt($ch, CURLOPT_HEADER,            0);
-//        curl_setopt($ch, CURLOPT_HEADER,            1);
-        curl_setopt($ch, CURLOPT_URL,               $this->url);
+        curl_setopt($ch, CURLOPT_HEADER,         0);
+//        curl_setopt($ch, CURLOPT_HEADER,         1);
+        curl_setopt($ch, CURLOPT_URL,            $this->url);
 
         //register a callback function which will process the headers
         //this assumes your code is into a class method, and uses $this->readHeader as the callback
@@ -102,6 +102,7 @@ class curl_out
         debug( "readHeader, header = ". print_r($header,1));
         //extracting example data: filename from header field Content-Disposition
         $filename = $this->extractCustomHeader('Content-Disposition: attachment; filename=', '\n', $header);
+
         if ($filename) {
             $this->response_meta_info['content_disposition'] = trim($filename);
         }

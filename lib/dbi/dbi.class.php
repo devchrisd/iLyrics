@@ -14,7 +14,7 @@ Abstract class dbi_class
 {
     public static $db_trace_select = 0x2;
     public static $db_trace_update = 0x4;
-    public static $db_trace_all = 0x6;
+    public static $db_trace_all    = 0x6;
 
     protected static $querycounter = 0;
 
@@ -53,16 +53,16 @@ Abstract class dbi_class
    */
    function __construct($host, $user, $passwd, $db = null, $ac = true)
    {
-      $this->user   = $user;
-      $this->passwd = $passwd;
-      $this->host   = $host;
+      $this->user       = $user;
+      $this->passwd     = $passwd;
+      $this->host       = $host;
       $this->database   = $db;
       $this->connection = FALSE;
 
       // the number of times to attempt reconnection
       $this->retry = 1;
 
-      $this->debug = false;
+      $this->debug        = false;
       $this->trace_buffer = "";
       $this->auto_commit  = $ac;
    }
@@ -163,7 +163,7 @@ Abstract class dbi_class
     * @return resource | boolean
     * Returns a resource representing a resultset if successful, or a boolean false on failure.
     */
-   function select($query,$supp_err_no = null)
+   function select(array $query_arr)
    {
       return false;
    }
@@ -181,9 +181,9 @@ Abstract class dbi_class
     * @return boolean
     * True on success, otherwise false.
     */
-   function insert($query, $supp_err_no =null)
+   function insert(array $insert_vars)
    {
-      return $this->update($query, $supp_err_no);
+        return $this->update($insert_vars);
    }
 
    /**
@@ -199,9 +199,9 @@ Abstract class dbi_class
     * @return boolean
     * True on success, otherwise false.
     */
-   function delete($query, $supp_err_no =null)
+   function delete($delete_vars)
    {
-      return $this->update($query, $supp_err_no);
+      return $this->update($delete_vars);
    }
 
    /**
@@ -218,7 +218,7 @@ Abstract class dbi_class
     * @return boolean
     * True on success; otherwise false.
     */
-    function update($query,$supp_err_no =null)
+    function update(array $update_vars)
     {
         return false;
     }
@@ -537,7 +537,7 @@ Abstract class dbi_class
 
     /**
      * return a comma separated string of all column's results
-     * 
+     *
      * @param string $query
      * @param string $column specific field to return
      * @return string blank string on error

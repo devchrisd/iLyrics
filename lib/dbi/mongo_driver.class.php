@@ -13,7 +13,7 @@ class mongo_interface_class extends dbi_class
     {
         if ($this->connection === FALSE)
         {
-            $this->connection = new Mongo();
+            $this->connection = new MongoClient();
         }
         return $this->connection;
     }
@@ -24,10 +24,21 @@ class mongo_interface_class extends dbi_class
         // debug(__METHOD__ . ' ' . $dbname);
     }
 
-    function select($db, $collection, $return_fields=array(), $query_arr=array())
+    function select(array $select_vars)
     {
+        list( $db, $collection, $return_fields, ) = $select_vars;
+
+        $query_arr = array();
+        if (isset($select_vars[3]))
+        {
+            $query_arr = $select_vars[3];
+        }
+
         $this->select_db($db);
-        $dataset = $this->database->$collection->find($query_arr, $return_fields);
+        $dataset = $this->database
+                        ->$collection
+                        ->find($query_arr, $return_fields);
+
         return $dataset;
     }
 
@@ -38,17 +49,19 @@ class mongo_interface_class extends dbi_class
         return $dataset;
     }
 
-    function insert($db, $collection, $data_arr)
+    function insert(array $insert_vars )
     {
+        list( $db, $collection, $data_arr ) = $insert_vars;
+
         $this->select_db($db);
         $this->database->$collection->save($data_arr);
-        // debug(__METHOD__ . ', data:' . print_r($data_arr, 1));
 
         // $this->database->$collection->insert($data_arr);
     }
 
-    function update($db, $collection, $query_arr, $data_arr)
+    function update(array $update_vars)
     {
+        list( $db, $collection, $query_arr, $data_arr ) = $update_vars;
         $this->select_db($db);
         $this->database->$collection->update($query_arr, array('$set' => $data_arr));
     }

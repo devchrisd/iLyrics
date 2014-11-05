@@ -15,8 +15,7 @@ class playlist
     function __construct($p_id=NULL)
     {
         $this->media_dbi = NULL;
-
-        $this->p_id       = $p_id;
+        $this->p_id      = $p_id;
         $this->p_str     = '';
     }
 
@@ -32,12 +31,14 @@ class playlist
     function get_playlist()
     {
         $result = FALSE;
+
         // get album cover
         if (empty($this->p_id) === FALSE)
         {
-            // get data 
+            // get data
             $this->__get_dbi();
             $query = 'SELECT title, song_list FROM ' . Configure::MEDIA_DB . 'playlist WHERE p_id=' . $this->media_dbi->escape_string($this->p_id);
+
             if ($result = $this->media_dbi->select($query) )
             {
                 if( $row = $this->media_dbi->fetch_row_assoc($result))
@@ -48,6 +49,7 @@ class playlist
                 }
             }
         }
+
         return $result;
     }
 
@@ -61,6 +63,7 @@ class playlist
 
         // insert into table
         $p_id = $this->media_dbi->insert($query);
+
         return $p_id;
     }
 

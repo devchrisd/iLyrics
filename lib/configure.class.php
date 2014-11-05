@@ -13,7 +13,11 @@ class Configure
     const USER          = 'developer';
     const PASSWD        = 'ppp';
     const MEDIA_DB      = 'media';
+    const MONGO         = 'mongo_interface_class';
+    const MYSQL         = 'mysql_interface_class';
 
-    const FIELD_LYRICS   = 'lyrics_file';
-    const FIELD_COVER    = 'cover_file';
+    public static $DB_DRIVER = self::MONGO;
+
+    const FIELD_LYRICS  = 'lyrics_file';
+    const FIELD_COVER   = 'cover_file';
 }
