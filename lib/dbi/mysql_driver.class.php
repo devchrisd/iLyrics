@@ -21,11 +21,11 @@ class mysql_interface_class extends dbi_class
         $retry = $this->retry;
         while($this->connection == FALSE && --$retry >= 0)
         {
-            $c = mysql_connect($this->host, $this->user, $this->passwd, false);
+            $c = mysqli_connect($this->host, $this->user, $this->passwd, false);
             if($c)
             {
                 $this->connection = &$c;
-                mysql_query("set names utf8", $c);
+                mysqli_query($c, "set names utf8");
 
                 if($this->database != null)
                 {
@@ -56,7 +56,7 @@ class mysql_interface_class extends dbi_class
     {
         $result =NULL;
         if ($this->connection){
-            $result = mysql_close($this->connection);
+            $result = mysqli_close($this->connection);
         }
         if ($result){
             $this->connection=NULL;
@@ -110,7 +110,7 @@ class mysql_interface_class extends dbi_class
 
      if($this->connection)
      {
-        $r = mysql_select_db($dbname,$this->connection);
+        $r = mysqli_select_db($this->connection, $dbname);
         if($r)
         {
             debug(__METHOD__ . " - selected database " . $dbname);
@@ -128,17 +128,17 @@ class mysql_interface_class extends dbi_class
      {
         debug(__METHOD__ . " - not connected.  deferring selection of database " . $dbname);
      }
-      
+
       return $r;
 
    }
 
    function escape_string($string)
    {
-        //return @mysql_escape_string($string);
+        //return @mysqli_escape_string($string);
         if ($this->connect())
         {
-            return mysql_real_escape_string($string, $this->connection);
+            return mysqli_real_escape_string($this->connection, $string);
         }
         else
         {
@@ -149,63 +149,63 @@ class mysql_interface_class extends dbi_class
 
    function error()
    {
-      return mysql_error($this->connection);
+      return mysqli_error($this->connection);
    }
 
    function errno()
    {
-      return mysql_errno($this->connection);
+      return mysqli_errno($this->connection);
    }
 
    function num_rows(&$result)
    {
-      return mysql_num_rows($result);
+      return mysqli_num_rows($result);
    }
 
    function affected_rows()
    {
-      return mysql_affected_rows($this->connection);
+      return mysqli_affected_rows($this->connection);
    }
 
     /**
-    *  Note: mysql_info() returns a non-FALSE value for the INSERT ... VALUES
+    *  Note: mysqli_info() returns a non-FALSE value for the INSERT ... VALUES
     *  statement only if multiple value lists are specified in the statement.
     **/
    function matched_rows()
    {
-      $mysql_info=mysql_info($this->connection);
-      preg_match("/Rows matched: ([0-9]*)/", $mysql_info,$matched_rows);
+      $mysqli_info=mysqli_info($this->connection);
+      preg_match("/Rows matched: ([0-9]*)/", $mysqli_info,$matched_rows);
       return $matched_rows[1];
    }
 
    function fetch_array(&$resultset)
    {
-      return mysql_fetch_array($resultset);
+      return mysqli_fetch_array($resultset);
    }
 
    function fetch_row_assoc(&$resultset)
    {
-      return mysql_fetch_assoc($resultset);
+      return mysqli_fetch_assoc($resultset);
    }
 
-   function fetch_row(&$resultset,$rownumber = null)
+   function fetch_row(&$resultset)
    {
-      return mysql_fetch_row($resultset);
+      return mysqli_fetch_row($resultset);
    }
 
-   function fetch_object(&$resultset,$rownumber = null)
+   function fetch_object(&$resultset)
    {
-      return mysql_fetch_object($resultset);
+      return mysqli_fetch_object($resultset);
    }
 
    function release(&$rs)
    {
-      return mysql_free_result($rs);
+      return mysqli_free_result($rs);
    }
 
    function data_seek(&$resource,$rnum)
    {
-      return mysql_data_seek($resource,$rnum);
+      return mysqli_data_seek($resource,$rnum);
    }
 
    function last_insert_id()
@@ -225,16 +225,16 @@ class mysql_interface_class extends dbi_class
       return $result;
    }
 
-   function &query($query,$supp_err_no)
+   function &query($query,$supp_err_no=null)
    {
       $result = false;
       ++self::$querycounter;
-      
+
       if(! $this->connection)
       {
          if(! $this->connect())
          {
-// connection failure logs itself           
+// connection failure logs itself
 //            $this->trace("failed to connect to " . $this->user . "@" .  $this->host);
          }
       }
@@ -247,7 +247,7 @@ class mysql_interface_class extends dbi_class
 
             $t_start = microtime(true);
 
-            $result = mysql_query('/* '. $this->get_backtrace_caller() .' */ '. $query,$this->connection);
+            $result = mysqli_query($this->connection, '/* '. $this->get_backtrace_caller() .' */ '. $query);
 
             $t_end = microtime(true);
 
@@ -267,7 +267,7 @@ class mysql_interface_class extends dbi_class
             }
             $logm .= ")";
             debug(__METHOD__ . ' - ' . $logm);
-            $result = mysql_query('/* '. $this->get_backtrace_caller() .' */ '. $query,$this->connection);
+            $result = mysqli_query($this->connection, '/* '. $this->get_backtrace_caller() .' */ '. $query);
          }
       }
 
@@ -288,11 +288,11 @@ class mysql_interface_class extends dbi_class
       return $result;
    }
 
-   function &unbuffered_query($query,$supp_err_no)
+   function &unbuffered_query($query,$supp_err_no=null)
    {
       $result = false;
       ++self::$querycounter;
-      
+
       if(! $this->connection)
       {
          if(! $this->connect())
@@ -303,7 +303,7 @@ class mysql_interface_class extends dbi_class
 
       if($this->connection)
       {
-        $result = mysql_unbuffered_query($query,$this->connection);
+        $result = mysqli_unbuffered_query($query,$this->connection);
       }
 
       if(!$result)
@@ -377,23 +377,23 @@ class mysql_interface_class extends dbi_class
         }
         return $result;
    }
-   
+
    function get_backtrace_caller()
    {
        $backtrace = debug_backtrace();
        // It goes through several steps before getting here
        $trace = count($backtrace) > 6 ? $backtrace[6]: $backtrace[count($backtrace)-1];
-       
+
        $comment = $trace['file'] .':'. $trace['line'] .' ';
-       
+
        if (!empty($trace['class'])) {
            $comment .= $trace['class'] .'::';
        }
-       
+
        if (!empty($trace['function'])) {
            $comment .= $trace['function'] .'()';
        }
-       
+
        return $comment;
    }
 }

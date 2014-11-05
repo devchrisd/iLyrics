@@ -440,7 +440,7 @@ Abstract class dbi_class
     * returns either the next row or the specified row from the result set
     * as an associative arrary.  the keys of the array are the column names.
     */
-   function fetch_row_assoc(&$resultset,$rownumber = null)
+   function fetch_row_assoc(&$resultset)
    {
       return false;
    }
@@ -460,7 +460,7 @@ Abstract class dbi_class
     * return either the next row or a specific row from the result set
     * as an array indexed by both column name and column position (base 0)
     */
-   function fetch_row(&$resultset,$rownumber = null)
+   function fetch_row(&$resultset)
    {
       return false;
    }
@@ -479,7 +479,7 @@ Abstract class dbi_class
     * return either the next row or a specific row from the result set
     * as an array indexed by column position (base 0)
     */
-   function fetch_array(&$resultset,$rownumber = null)
+   function fetch_array(&$resultset)
    {
       return false;
    }
@@ -497,7 +497,7 @@ Abstract class dbi_class
     * return either the next row or a specific row from the result set
     * as an object representation
     */
-   function fetch_object(&$resultset,$rownumber = null)
+   function fetch_object(&$resultset)
    {
       return false;
    }
@@ -537,7 +537,7 @@ Abstract class dbi_class
 
     /**
      * return a comma separated string of all column's results
-     * 
+     *
      * @param string $query
      * @param string $column specific field to return
      * @return string blank string on error

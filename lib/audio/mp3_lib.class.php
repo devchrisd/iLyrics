@@ -15,7 +15,7 @@ class mp3_lib
         self::__get_dbi();
     }
 
-    // scan and set file name of songs(including path) into array mp3_arr 
+    // scan and set file name of songs(including path) into array mp3_arr
     function _scan_mp3($dir = Configure::AUDIO_PATH)
     {
         $files = null;
@@ -48,7 +48,7 @@ class mp3_lib
     /*
     function isfile($file){
         return preg_match('/^[^.^:^?^\-][^:^?]*\.(?i)' . getexts() . '$/',$file);
-        //first character cannot be . : ? - 
+        //first character cannot be . : ? -
         //subsequent characters can't be a : ?
         //then a . character and must end with one of your extentions
         //getexts() can be replaced with your extentions pattern
@@ -58,10 +58,10 @@ class mp3_lib
         //list acceptable file extensions here
         return '(app|avi|doc|docx|exe|ico|mid|midi|mov|mp3|
                      mpg|mpeg|pdf|psd|qt|ra|ram|rm|rtf|txt|wav|word|xls)';
-    } 
+    }
     */
 
-    function __get_dbi()
+    static function __get_dbi()
     {
         if (self::$media_dbi === NULL)
         {
@@ -82,9 +82,10 @@ class mp3_lib
 
         if (self::$media_dbi->connect())
         {
-        // delete current data 
+            // delete current data
             $query = 'DELETE FROM ' . Configure::MEDIA_DB . '.song';
             self::$media_dbi->update($query);
+
             $query = 'ALTER TABLE ' . Configure::MEDIA_DB . '.song AUTO_INCREMENT=0';
             self::$media_dbi->update($query);
 
@@ -182,7 +183,7 @@ class mp3_lib
         return $list;
     }
 
-    function get_song_info($s_id)
+    static public function get_song_info($s_id)
     {
         self::__get_dbi();
 
@@ -289,7 +290,7 @@ class mp3_lib
          metainformation is always available under [tags] even if this is not called
         */
         // debug( print_r($ThisFileInfo,1));
-       
+
         getid3_lib::CopyTagsToComments($ThisFileInfo);
         if (isset($ThisFileInfo['comments']) && !empty($ThisFileInfo['comments']))
         {
@@ -324,7 +325,7 @@ class mp3_lib
         {
             case Configure::FIELD_COVER:
                 // update all records of (album, artist)
-                // 
+                //
                 $query_select = 'SELECT album, artist FROM ' . Configure::MEDIA_DB . '.song WHERE s_id="' . self::$media_dbi->escape_string($s_id) . '"';
                 if ($result_select = self::$media_dbi->select($query_select) )
                 {
@@ -373,22 +374,22 @@ class mp3_lib
     function get_ID3_old()
     {
         $version = id3_get_version( $this->song_file );
-        if ($version & ID3_V2_4) 
+        if ($version & ID3_V2_4)
         {
             $id3_version = ID3_V2_4;
             debug( "Contains a 2.4 tag".PHP_EOL);
         }
-        elseif ($version & ID3_V2_3) 
+        elseif ($version & ID3_V2_3)
         {
             $id3_version = ID3_V2_3;
             debug( "Contains a 2.3 tag".PHP_EOL);
         }
-        elseif ($version & ID3_V2_2) 
+        elseif ($version & ID3_V2_2)
         {
             $id3_version = ID3_V2_2;
             debug( "Contains a 2.2 tag".PHP_EOL);
         }
-        elseif ($version & ID3_V2_1) 
+        elseif ($version & ID3_V2_1)
         {
             $id3_version = ID3_V2_1;
             debug( "Contains a 2.1 tag".PHP_EOL);
@@ -489,7 +490,7 @@ class mp3_lib
         // {
         //     print(" $key: $value\r\n");
         // }
-        
+
         return $data;
     }
 */
