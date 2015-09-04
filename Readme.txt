@@ -4,7 +4,7 @@ FEATURE:
  - playlist: add and remove songs to playlist
  - use HTML5 audio element, no plugin required
  - can read and apply offset in .lrc file:
-    format: 
+    format:
         [offset:300]    // delay 300ms
         or
         [offset:-300]   // shift ahead 300ms
@@ -24,13 +24,13 @@ Testing Environment:
 
 USAGE:
 
-- Put mp3 files in folder "audio/"
+- Put mp3 files in folder "resource/audio/"
 
-- Album cover is saved in "images/cover"
+- Album cover is saved in "resource/cover/"
 
-- Lyrics will be saved in "lyric/"
+- Lyrics will be saved in "resource/lyric/"
     - Lyrics file name has the format of ARTIST_SONG.lrc (with no space)
-        If this file is not availble, it will try the name SONG.lrc. 
+        If this file is not availble, it will try the name SONG.lrc.
         If this name SONG.lrc is available, and artist name is known, it will rename SONG.lrc to ARTIST_SONG.lrc.
 
     - If lyrics is not available locally, it will try to search and download online.
@@ -38,7 +38,7 @@ USAGE:
 
 SETUP:
 
-- Apache or the webserver user/group must have permission to create/modify file in lyric/, audio/, and image/cover. Use command:
+- Apache or the webserver user/group must have permission to create/modify file in resource/ (lyric/, audio/, and cover/ ). Use command:
     sudo chown www:www [dir]
 - Build up database with sql script in config/database_setup.sql
 - create user 'developer' in mysql:
@@ -46,7 +46,7 @@ SETUP:
 	mysql> grant all on media.* to 'developer'@'localhost';
 	mysql> flush privileges;
 
-- Run [sitename_iLyrics]/iLyrics_controller.php?action=lib_refresh to scan the audio / lyrics and cover folder to setup database
+- Run [sitename_iLyrics]/iLyrics_controller.php?action=lib_refresh to scan the resource audio / lyrics and cover folder to setup database
 
 
 

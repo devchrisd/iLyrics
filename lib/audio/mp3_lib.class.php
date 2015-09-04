@@ -15,19 +15,26 @@ class mp3_lib
         self::__get_dbi();
     }
 
-    // scan and set file name of songs(including path) into array mp3_arr
-    function _scan_mp3($dir = Configure::AUDIO_PATH)
+    /**
+     * scan and set mp3 info into DB
+     * @param  string $dir directory to scan
+     */
+    public function _scan_mp3($dir = Configure::AUDIO_PATH)
     {
         $files = null;
         if ( ($files = array_diff(scandir($dir), array('..', '.', '.DS_Store'))) && count($files)>0 )
         {
+            // save each file and save info into database
             foreach ($files as $file)
             {
                 $file = ((empty($dir)) ? '' : $dir) . $file;
                 if ( is_dir($file) !== true && $this->is_mp3($file) )
                 {
                     debug(__METHOD__ . ' file: ' . $file);
-                    $this->mp3_arr[] = $file;
+                    if (!$this->add_to_db($file))
+                    {
+                        continue;
+                    }
                 }
                 elseif (is_dir($file) === true)
                 {
@@ -38,10 +45,10 @@ class mp3_lib
             }
         }
 
-        return $this->mp3_arr;
+        return;
     }
 
-    function is_mp3($file)
+    private function is_mp3($file)
     {
         return preg_match('/^[^.^:^?^\-][^:^?]*\.(?i)(mp3)$/',$file);
     }
@@ -70,18 +77,13 @@ class mp3_lib
         }
     }
 
-    function refresh_DB()
+    public function refresh_DB()
     {
-        // scan media folder and put them into mp3_arr
-        $this->_scan_mp3();
-
-        if ($this->mp3_arr === NULL)
-            return;
-
         self::__get_dbi();
 
         if (self::$media_dbi->connect())
         {
+            // Reset table media:song
             // delete current data
             $query = 'DELETE FROM ' . Configure::MEDIA_DB . '.song';
             self::$media_dbi->update($query);
@@ -89,68 +91,72 @@ class mp3_lib
             $query = 'ALTER TABLE ' . Configure::MEDIA_DB . '.song AUTO_INCREMENT=0';
             self::$media_dbi->update($query);
 
-            // save each file info into database
-            foreach ($this->mp3_arr as $key => $value)
+            $this->_scan_mp3();
+        }
+    }
+
+    private function add_to_db($value)
+    {
+        //$iLyrics = new ilyrics(basename($value));
+        $title = $artist = $album = $year = $genre = '';
+
+        // get id3
+        $id3 = $this->get_ID3($value);
+
+        if ($id3 !== NULL)
+        {
+            $title  = isset($id3['title'])  ? $id3['title'] : '';
+            $artist = isset($id3['artist']) ? $id3['artist']: '';
+            $album  = isset($id3['album'])  ? $id3['album'] : '';
+            $year   = isset($id3['year'])   ? $id3['year']  : '';
+            $genre  = isset($id3['genre'])  ? $id3['genre'] : '';
+
+            $_title  = _covert_for_URL_string($title);
+            $_artist = _covert_for_URL_string($artist);
+            $_album  = _covert_for_URL_string($album);
+
+            $lyrics_file = Configure::LYRICS_PATH . $_artist . '_' . $_title . '.lrc';
+            if (file_exists($lyrics_file) === FALSE)
             {
-                //$iLyrics = new ilyrics(basename($value));
-                $title = $artist = $album = $year = $genre = '';
-                // get id3
-                $id3 = $this->get_ID3($value);
-                if ($id3 !== NULL)
-                {
-                    $title  = isset($id3['title'])  ? $id3['title'] : '';
-                    $artist = isset($id3['artist']) ? $id3['artist']: '';
-                    $album  = isset($id3['album'])  ? $id3['album'] : '';
-                    $year   = isset($id3['year'])   ? $id3['year']  : '';
-                    $genre  = isset($id3['genre'])  ? $id3['genre'] : '';
+                $lyrics_file = NULL;
+            }
 
-                    $_title  = _covert_for_URL_string($title);
-                    $_artist = _covert_for_URL_string($artist);
-                    $_album  = _covert_for_URL_string($album);
-                    $lyrics_file = Configure::LYRICS_PATH . $_artist . '_' . $_title . '.lrc';
-                    if (file_exists($lyrics_file) === FALSE)
-                    {
-                        $lyrics_file = NULL;
-                    }
-                    $cover_file = Configure::COVER_PATH . $_artist . '_' . $_album . '.jpg';
-                    if (file_exists($cover_file) === FALSE)
-                    {
-                        $cover_file = NULL;
-                    }
-                }
-
-                $query = 'REPLACE INTO ' . Configure::MEDIA_DB . '.song'
-                        . " SET song_file='" . self::$media_dbi->escape_string($value) . "',"
-                        . " title='" . self::$media_dbi->escape_string($title) . "',"
-                        . " artist='" . self::$media_dbi->escape_string($artist) . "',"
-                        . " album='" . self::$media_dbi->escape_string($album) . "',"
-                        . " year='" . self::$media_dbi->escape_string($year) . "',"
-                        . " genre='" . self::$media_dbi->escape_string($genre) . "'"
-                        ;
-                if ($lyrics_file !== NULL)
-                {
-                    $query .= ", lyrics_file='" . self::$media_dbi->escape_string($lyrics_file) . "'";
-                }
-                if ($cover_file !== NULL)
-                {
-                    $query .= ", cover_file='" . self::$media_dbi->escape_string($cover_file) . "'";
-                }
-                try
-                {
-                    self::$media_dbi->insert($query);
-                }
-                catch (Exception $e) {
-                    debug('Caught Exception : '. $e->getMessage() . "\n");
-                }
-
+            $cover_file = Configure::COVER_PATH . $_artist . '_' . $_album . '.jpg';
+            if (file_exists($cover_file) === FALSE)
+            {
+                $cover_file = NULL;
             }
         }
 
+        $query = 'REPLACE INTO ' . Configure::MEDIA_DB . '.song'
+                . " SET song_file='" . self::$media_dbi->escape_string($value) . "',"
+                . " title='" . self::$media_dbi->escape_string($title) . "',"
+                . " artist='" . self::$media_dbi->escape_string($artist) . "',"
+                . " album='" . self::$media_dbi->escape_string($album) . "',"
+                . " year='" . self::$media_dbi->escape_string($year) . "',"
+                . " genre='" . self::$media_dbi->escape_string($genre) . "'"
+                ;
+        if ($lyrics_file !== NULL)
+        {
+            $query .= ", lyrics_file='" . self::$media_dbi->escape_string($lyrics_file) . "'";
+        }
 
+        if ($cover_file !== NULL)
+        {
+            $query .= ", cover_file='" . self::$media_dbi->escape_string($cover_file) . "'";
+        }
+
+        if (self::$media_dbi->insert($query) == false)
+        {
+            error_log(__METHOD__ . ' failed: ' . $query);
+            return false;
+        }
+
+        return true;
     }
 
     // get media list from database
-    function get_list_from_DB()
+    public function get_list_from_DB()
     {
         $list = NULL;
         $index = 0;
@@ -172,18 +178,19 @@ class mp3_lib
         }
 
 // $test_arr = array(
-//     // 'audio/01.七个母音.mp3',
-//         // 'audio/富士山下.mp3',
-//     'audio/01.天边.mp3',
-//         // 'audio/02.轻轻地告诉你.mp3',
-//         // 'audio/对不起谢谢.mp3',
+//     'resource/audio/01.七个母音.mp3',
+//     'resource/audio/富士山下.mp3',
+//     'resource/audio/01.天边.mp3',
+//     'resource/audio/02.轻轻地告诉你.mp3',
+//     'resource/audio/对不起谢谢.mp3',
 // );
 // foreach ($test_arr as $value)
 //         self::get_ID3($value);
+
         return $list;
     }
 
-    static public function get_song_info($s_id)
+    public static function get_song_info($s_id)
     {
         self::__get_dbi();
 
@@ -202,7 +209,7 @@ class mp3_lib
         return NULL;
     }
 
-    function set_song_id3(
+    public static function set_song_id3(
             $s_id,
             $title,
             $artist,
@@ -252,7 +259,7 @@ class mp3_lib
         return $result;
     }
 
-    public function set_ID3($TagData, $Filename)
+    public static function set_ID3($TagData, $Filename)
     {
         require_once(dirname(__FILE__) . '/../getid3/write.php');
 
@@ -266,13 +273,13 @@ class mp3_lib
         $tagwriter->tag_data = $TagData;
         if ($tagwriter->WriteTags())
         {
-            debug('Successfully wrote tags');
+            debug(__METHOD__ . ' Successfully wrote tags');
             if (!empty($tagwriter->warnings))
             {
-                debug('There were some warnings:' . $tagwriter->warnings);
+                debug(__METHOD__ . ' There were some warnings:' . $tagwriter->warnings);
             }
         } else {
-            debug ('Failed to write tags! ' . print_r($tagwriter->errors,1));
+            debug(__METHOD__ . ' Failed to write tags! ' . print_r($tagwriter->errors,1));
         }
     }
 
@@ -310,12 +317,13 @@ class mp3_lib
             $filename = basename($song_file);
             $id3['title'] = substr($filename, 0, strrpos($filename, '.'));
         }
-        // debug( print_r($id3,1));
+
+        debug( __METHOD__ . print_r($id3,1));
 
         return $id3;
     }
 
-    function update_record($s_id, $data, $field)
+    public static function update_record($s_id, $data, $field)
     {
         $ret = FALSE;
 
@@ -353,7 +361,7 @@ class mp3_lib
         return $ret;
     }
 
-    function get_cover($s_id)
+    public static function get_cover($s_id)
     {
         if ($s_id)
         {

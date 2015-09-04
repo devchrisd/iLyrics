@@ -414,6 +414,20 @@ class getid3_lib
 		return $newarray;
 	}
 
+	public static function flipped_array_merge_noclobber($array1, $array2) {
+		if (!is_array($array1) || !is_array($array2)) {
+			return false;
+		}
+		# naturally, this only works non-recursively
+		$newarray = array_flip($array1);
+		foreach (array_flip($array2) as $key => $val) {
+			if (!isset($newarray[$key])) {
+				$newarray[$key] = count($newarray);
+			}
+		}
+		return array_flip($newarray);
+	}
+
 
 	public static function ksort_recursive(&$theArray) {
 		ksort($theArray);
@@ -519,15 +533,14 @@ class getid3_lib
 	}
 
 	public static function XML2array($XMLstring) {
-		if (function_exists('simplexml_load_string')) {
-			if (function_exists('get_object_vars')) {
-				if (function_exists('libxml_disable_entity_loader')) { // (PHP 5 >= 5.2.11)
-					// http://websec.io/2012/08/27/Preventing-XEE-in-PHP.html
-					libxml_disable_entity_loader(true);
-				}
-				$XMLobject = simplexml_load_string($XMLstring);
-				return self::SimpleXMLelement2array($XMLobject);
-			}
+		if (function_exists('simplexml_load_string') && function_exists('libxml_disable_entity_loader')) {
+			// http://websec.io/2012/08/27/Preventing-XEE-in-PHP.html
+			// https://core.trac.wordpress.org/changeset/29378
+			$loader = libxml_disable_entity_loader(true);
+			$XMLobject = simplexml_load_string($XMLstring, 'SimpleXMLElement', LIBXML_NOENT);
+			$return = self::SimpleXMLelement2array($XMLobject);
+			libxml_disable_entity_loader($loader);
+			return $return;
 		}
 		return false;
 	}
@@ -955,7 +968,6 @@ class getid3_lib
 						$converted_string = rtrim($converted_string, "\x00");
 						break;
 				}
-// error_log(__METHOD__ . ", convert $string: $in_charset, $out_charset, $converted_string");
 				return $converted_string;
 			}
 
@@ -1167,6 +1179,11 @@ class getid3_lib
 				fwrite($tmp, $imgData);
 				fclose($tmp);
 				$GetDataImageSize = @getimagesize($tempfilename, $imageinfo);
+				if (($GetDataImageSize === false) || !isset($GetDataImageSize[0]) || !isset($GetDataImageSize[1])) {
+					return false;
+				}
+				$GetDataImageSize['height'] = $GetDataImageSize[0];
+				$GetDataImageSize['width']  = $GetDataImageSize[1];
 			}
 			unlink($tempfilename);
 		}

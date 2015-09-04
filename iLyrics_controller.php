@@ -23,8 +23,10 @@ switch ($action) {
         {
             $mp3_lib->refresh_DB();
         }
+
         // Get list from DB
         $mp3_list = $mp3_lib->get_list_from_DB();
+
         if ($mp3_list !== NULL && count($mp3_list) > 0)
         {
             echo json_encode($mp3_list);
@@ -44,12 +46,15 @@ switch ($action) {
 
         echo json_encode($ret);
         break;
+
     case 'save_lyrics':
         if ($s_id === NULL) break;
 
         $lyrics = '';
         if (isset($_POST['lyrics']) === true && empty($_POST['lyrics']) !== true)
+        {
             $lyrics =  $_POST['lyrics'];
+        }
 
         $result = mp3_lib::get_song_info($s_id);
 
@@ -69,6 +74,7 @@ switch ($action) {
         $tag = mp3_lib::get_song_info($s_id);
         echo json_encode($tag);
         break;
+
     case 'save_tag':
         if ($s_id === NULL) break;
 
