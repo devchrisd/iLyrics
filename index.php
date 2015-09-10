@@ -2,13 +2,13 @@
 <head>
     <title>iLyrics</title>
     <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-    
+
     <script type="text/javascript" src='script/jquery-2.1.0.js'></script>
     <script type="text/javascript" src="script/jquery-ui-1.10.4.custom.min.js"></script>
 
-    <script language = "javascript" src="script/iLyrics.js"></script>
+    <script language = "javascript" src="script/ilyrics.js"></script>
     <script language = "javascript" src="script/lrc.js"></script>
-    
+
     <link rel="stylesheet" type="text/css" href="css/common.css">
     <link rel="stylesheet" type="text/css" href="css/lyrics.css">
 </head>
@@ -30,10 +30,12 @@
         <div class='div-list'>
             <header>
                 <h3>Playlist
-                <span id='loop_status' class='right'></span>
-                <img class='loop float_right_button' alt='O' src='images/loop-square_25.jpg' title='repeat all' />
-                <img class='float_right_button' src='image/save_file.jpg' title='save playlist' alt='save' />
-                <img class='float_right_button' src='image/load_file.jpg' title='load playlist' alt='load' />
+                <!--  <span id='loop_status' class='right'></span> -->
+                <span class='float_right_button'>
+                <img class='' src='images/file_load.png' title='load playlist' alt='load' />
+                <img class='' src='images/file_save.png' title='save playlist' alt='save' />
+                <img  id='loop_icon' class='loop' alt='O' src='images/loop_on.png' title='repeat on' />
+                </span>
                 </h3>
             </header>
             <ul id='playlist' class='list' p_id=''>

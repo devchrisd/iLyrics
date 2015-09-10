@@ -17,20 +17,20 @@ $(function()
     });
 
 /*
-    (1) $(document).on('event', 'selector', handler) works for dynamically created elements, 
+    (1) $(document).on('event', 'selector', handler) works for dynamically created elements,
     (2) $('selector').on('event', handler) will not work for dynamic delegation.
-     
+
     Should $(document).on() be used for everything?
       It will work but if you don't need the dynamic delegation, it would be more appropriate to use (2) because (1) requires slightly more work from the browser. There won't be any real impact on performance but it makes sense to use the most appropriate method for your use.
 
-    To remove events bound with .on(), see .off(). 
+    To remove events bound with .on(), see .off().
     To attach an event that runs only once and then removes itself, see .one()
 */
     // add song to playlist
     $(document).on('click', '.add_song', function(){
         // add to playlist
         $('#playlist').append(
-                                "<li><span class='play_song' s_id='" + $(this).attr('s_id') + "' path='" + $(this).attr('path') + "' title='click to play'>" + $(this).text() + 
+                                "<li><span class='play_song' s_id='" + $(this).attr('s_id') + "' path='" + $(this).attr('path') + "' title='click to play'>" + $(this).text() +
                                 "</span><img class='float_right_button remove' alt='[X]' title='remove from list' /></li>"
                             );
     });
@@ -176,6 +176,16 @@ $(function()
         }
         $('#loop_status').text(status);
 
+        if ($(this).attr("class") == "loop")
+        {
+            this.src = this.src.replace("_on", "_off");
+        }
+        else
+        {
+            this.src = this.src.replace("_off", "_on");
+        }
+
+        $(this).toggleClass("on");
     });
 
     $('#lyrics_edit').on('click', function(){

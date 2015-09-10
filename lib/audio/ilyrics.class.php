@@ -169,6 +169,7 @@ class ilyrics
     function fetch()
     {
         $result = $this->is_lyrics_local();
+
         if ($result !== FALSE)
         {
             debug( "get file " . $this->lyrics_files[0]);
@@ -190,7 +191,6 @@ class ilyrics
         return $this->lyrics;
     }
 
-    // is the lyrics already in database
     function is_lyrics_local()
     {
         if (count($this->lyrics_files) == 0)
@@ -304,6 +304,12 @@ class ilyrics
                     foreach ($result_arr['result'] as $key => $lrc_arr)
                     {
                         $count++;
+
+                        if (isset($lrc_arr['aid']) === TRUE)
+                        {
+                            $this->fetch_cover($curl, $lrc_arr['aid']);
+                        }
+
                         if (isset($lrc_arr['lrc']) === TRUE && empty($lrc_arr['lrc']) === FALSE)
                         {
                             $lyrics_url = $lrc_arr['lrc'];
@@ -313,36 +319,11 @@ class ilyrics
                             $curl->set_para($lyrics_url);
                             $this->lyrics = $curl->send_request();
                             $response_header = $curl->getHeaders();
+
                             if ($response_header['http_code'] !== 200)
                             {
                                 $this->lyrics = '';
                                 debug(__METHOD__ . " :$count: online Lyrics Got " . $response_header['http_code'] . ' ! ! ! ');
-                            }
-
-                            // get cover:         http://geci.me/api/cover/AlbumId
-                            if (
-                                    (
-                                        isset($this->song_info['cover_file']) === FALSE ||
-                                        empty($this->song_info['cover_file']) === TRUE
-                                    )
-                                    &&
-                                    isset($lrc_arr['aid']) === TRUE
-                                )
-                            {
-                                $cover_url = self::COVER_SEARCH_URL . $lrc_arr['aid'];
-                                $curl->set_para($cover_url);
-                                $cover_arr = json_decode($curl->send_request(), TRUE);
-
-                                debug('get cover file: ' . print_r($cover_arr,1));
-
-                                if (isset($cover_arr['result']['thumb']) === TRUE &&
-                                    empty($cover_arr['result']['thumb']) === FALSE
-                                    )
-                                {
-                                    $imagefile = $cover_arr['result']['thumb'];
-                                    $this->cover_file .= '.' . substr($imagefile, strrpos($imagefile, '.')+1);
-                                    $this->__save_file($this->cover_file, file_get_contents($imagefile), Configure::FIELD_COVER);
-                                }
                             }
 
                             if ($this->lyrics !== '')
@@ -361,5 +342,29 @@ class ilyrics
 
         unset($curl);
         return $result;
+    }
+
+    // get cover:  http://geci.me/api/cover/AlbumId
+    public function fetch_cover($curl, $aid)
+    {
+        if (isset($this->song_info['cover_file']) === FALSE ||
+            empty($this->song_info['cover_file']) === TRUE
+            )
+        {
+            $cover_url = self::COVER_SEARCH_URL . $aid;
+            $curl->set_para($cover_url);
+            $cover_arr = json_decode($curl->send_request(), TRUE);
+
+            debug('get cover file: ' . print_r($cover_arr,1));
+
+            if (isset($cover_arr['result']['thumb']) === TRUE &&
+                empty($cover_arr['result']['thumb']) === FALSE
+                )
+            {
+                $imagefile = $cover_arr['result']['thumb'];
+                $this->cover_file .= '.' . substr($imagefile, strrpos($imagefile, '.')+1);
+                $this->__save_file($this->cover_file, file_get_contents($imagefile), Configure::FIELD_COVER);
+            }
+        }
     }
 }
