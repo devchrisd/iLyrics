@@ -1,12 +1,11 @@
 <?php
 
 require_once(dirname(__FILE__) . '/../getid3/getid3.php');
-require_once(dirname(__FILE__) . '/../dbi/mysql_driver.class.php');
+require_once(dirname(__FILE__) . '/../base_lib.class.php');
 
-class mp3_lib
+class mp3_lib extends base_lib
 {
     var $mp3_arr;
-    static $media_dbi;
 
     function __construct()
     {
@@ -67,15 +66,6 @@ class mp3_lib
                      mpg|mpeg|pdf|psd|qt|ra|ram|rm|rtf|txt|wav|word|xls)';
     }
     */
-
-    static function __get_dbi()
-    {
-        if (self::$media_dbi === NULL)
-        {
-            // debug(print_r(debug_backtrace(),1));
-            self::$media_dbi = new mysql_interface_class(Configure::HOST, Configure::USER, Configure::PASSWD, Configure::MEDIA_DB);
-        }
-    }
 
     public function refresh_DB()
     {

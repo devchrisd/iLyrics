@@ -21,26 +21,30 @@
 
     <div id='container'>
     <section class='container-left'>
+
         <div id='div-player'>
             <audio id='player' controls playbackrate='1.0' autoplay>
                 <p>Your browser does not support the audio element.</p>
             </audio>
             <figure><img id='artist_avatar' alt='artist' src='' /></figure>
         </div>
+
         <div class='div-list'>
             <header>
                 <h3>Playlist
-                <!--  <span id='loop_status' class='right'></span> -->
                 <span class='float_right_button'>
-                <img class='' src='images/file_load.png' title='load playlist' alt='load' />
-                <img class='' src='images/file_save.png' title='save playlist' alt='save' />
-                <img  id='loop_icon' class='loop' alt='O' src='images/loop_on.png' title='repeat on' />
+                <img class='show_pl' src='images/file_load.png' title='load playlist' alt='load' />
+                <img class='save_pl' src='images/file_save.png' title='save playlist' alt='save' />
+                <img id='loop_icon' class='loop' alt='O' src='images/loop_on.png' title='repeat on' />
                 </span>
                 </h3>
+                <div id='div-pl'></div>
+
             </header>
             <ul id='playlist' class='list' p_id=''>
             </ul>
         </div>
+
         <div class='div-list'>
             <header>
                 <h3>Library</h3>

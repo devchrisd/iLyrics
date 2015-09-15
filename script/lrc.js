@@ -2,9 +2,9 @@
 // object to show KaraOK style lyrics
 var lrc = {
 
-    init: true, // first time show this lyrics
-    offset: 0,  // time offset from lrc file
-    islrc: true,  // song has lrc style lyrics
+    init: true,  // first time show this lyrics
+    offset: 0,   // time offset from lrc file
+    islrc: true, // song has lrc style lyrics
 
     elementSong: null,
     elementLyrics: null,
@@ -12,10 +12,10 @@ var lrc = {
     scrollh: 0,
     scrollInterval: 10,
 
-    index: 0,   // for lytext and lytime
-    currentLine: 0,     // lyrics line number of the current position
-    lytext: new Array(),// lyrics text
-    lytime: new Array(),// lyrics time
+    index: 0,            // for lytext and lytime
+    currentLine: 0,      // lyrics line number of the current position
+    lytext: new Array(), // lyrics text
+    lytime: new Array(), // lyrics time
     lyricsPlayTimeout: null,
     lyricsScrollTimeout: null,
 
@@ -24,8 +24,8 @@ var lrc = {
         this.init       = true;
         this.offset     = 0;
         this.index      = 0;
-        this.lytext     = new Array();// lyrics text
-        this.lytime     = new Array();// lyrics time
+        this.lytext     = new Array(); // lyrics text
+        this.lytime     = new Array(); // lyrics time
         this.currentLine= 0;
         this.scrollh    = 0;
         this.islrc      = true;
@@ -45,7 +45,7 @@ var lrc = {
         this.elementLyrics.append(lrc_lyrics);
     },
 
-    // ele_song:   element, 
+    // ele_song:   element,
     // ele_lyrics: element
     // lrc_lyrics: lyrics content
     start: function(ele_song, ele_lyrics, lrc_lyrics)
@@ -125,7 +125,7 @@ var lrc = {
         return offset;
     },
 
-    // parsing the Lyrics 
+    // parsing the Lyrics
     processData: function (data)
     {
         var arr_lyrics = null;
@@ -159,7 +159,7 @@ var lrc = {
         for(i=0; i<arr_lyrics.length ; i++)
         {
             // get time
-            // 
+            //
             // Sometimes there are lines with 2 time setting.
             // the same lyrics is repeated in other time
             l_time = arr_lyrics[i].match(/(\[\d{2}:\d{2}(.\d{1,2})?\])|(\[\d{2}:\d{2}:\d{2}(.\d{1,2})?\])/ig);
