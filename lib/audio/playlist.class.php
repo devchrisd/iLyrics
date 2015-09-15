@@ -26,8 +26,9 @@ class playlist extends base_lib
         return $list;
     }
 
-    static public function save_playlist($p_list, $p_id)
+    static public function save_playlist($param)
     {
+        error_log(__METHOD__);
 
     }
 

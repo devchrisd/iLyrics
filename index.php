@@ -39,6 +39,7 @@
                 </span>
                 </h3>
                 <div id='div-pl'></div>
+                <div id='div-save-pl'></div>
 
             </header>
             <ul id='playlist' class='list' p_id=''>

@@ -84,19 +84,24 @@ switch ($action) {
         break;
 
     case 'save_playlist':
-        if (isset($_REQUEST['p_id']) === true && empty($_REQUEST['p_id']) !== true &&
-            isset($_REQUEST['p_list']) === true && empty($_REQUEST['p_list']) !== true
+        if (
+            (isset($_REQUEST['p_id']) === true && empty($_REQUEST['p_id']) !== true ||
+             isset($_REQUEST['p_name']) === true && empty($_REQUEST['p_name']) !== true ) &&
+            isset($_REQUEST['s_id']) === true && empty($_REQUEST['s_id']) !== true
             )
         {
-            $p_id = $_REQUEST['p_id'];
-            $p_list = $_REQUEST['p_list'];
+            $param = array(
+                'p_id' => $_REQUEST['p_id'],
+                'p_name' => $_REQUEST['p_name'],
+                's_id'  => $_REQUEST['s_id'],
+                );
         }
         else
         {
             break;
         }
 
-        save_playlist($p_id, $p_list);
+        save_playlist($param);
         break;
     default:
         break;
@@ -207,10 +212,12 @@ function get_playlist($p_id)
             // "</span>"
 }
 
-function save_playlist($p_name, $p_list)
+function save_playlist($param)
 {
+        error_log(__METHOD__. print_r($param,1));
+
     $result = playlist::save_playlist(
-                $p_name, $p_list
+                $param
                 );
     echo json_encode($result);
 }

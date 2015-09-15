@@ -325,8 +325,90 @@ $(function()
         $('#div-pl').html('');
     });
 
+     // save playlist to server
+    $(document).on('click', '.save_pl', function(){
+
+        s_id_arr = [];
+        p_id = p_name = '';
+        index = 0;
+
+        if ($('#playlist').attr('p_id') !== '')
+        {
+        }
+        else
+        {
+            // get a playlist name
+            // Note: jQuery UI does not support positioning hidden elements.
+            $('#div-save-pl').html('');
+            $('#div-save-pl').show();
+            $("#div-save-pl").position({
+                my:        "left top",
+                at:        "right top",
+                of:        $(this), // or $("#otherdiv)
+                collision: "flipfit"
+            });
+            $('#div-save-pl').html("<span class='float_right_button'>X</span>"+
+                "Playlist name:" +
+                "<form id='form-save-playlist' action='#'>" +
+                "<input type='text' name='save_p_name' id='save_p_name' value='' />" +
+                "<input type='submit' id='submit' value='Save' /></form>");
+        }
+    });
+
+    $(document).on('submit', '#form-save-playlist', function()
+    {
+        p_name = $('#save_p_name').val();
+
+        if (p_name == '')
+        {
+            alert('Empty name!');
+            return;
+        }
+
+        save_pl(p_name);
+        $('#div-save-pl>.float_right_button').click();
+    });
+
+
+    // hide tag div by clicking 'X'
+    $(document).on('click', '#div-save-pl>.float_right_button', function()
+    {
+        $('#div-save-pl').hide();
+        $('#div-save-pl').html('');
+    });
 
 });
+
+    function save_pl()
+    {
+        s_id_arr = [];
+        p_id = '';
+        index = 0;
+
+        p_id = $('#playlist').attr('p_id');
+
+        // get all items in player
+        $('.play_song').each(function()
+        {
+            s_id_arr[index++] = $(this).attr('s_id');
+        });
+
+log('save playlist: ' + s_id_arr);
+
+        $.ajax({
+            url: controller_url,
+            type: "POST",
+            data: { action: 'save_playlist', p_id: p_id, p_name: p_name, s_id: s_id_arr}
+        })
+        .done( function(result)
+        {
+            log(result);
+
+        });
+
+        return false;
+
+    }
 
 /**
  * Song and Lyric
