@@ -66,8 +66,10 @@ switch ($action) {
         break;
 
     case 'show_playlist':
-        $pl = playlist::show_playlist();
-        echo json_encode($pl);
+        $playlist = new playlist;
+        $result   = $playlist->show_playlist();
+
+        echo json_encode($result);
         break;
 
     case 'get_playlist':
@@ -204,19 +206,17 @@ function get_cover($s_id)
 
 function get_playlist($p_id)
 {
-    $playlist = '';
-    $playlist = playlist::get_playlist($p_id);
-    echo json_encode($playlist);
-
-            // "<span class='play_song' s_id='" + $(this).attr('s_id') + "' file='" + $(this).attr('file') + "' title='click to play'>" + $(this).text() +
-            // "</span>"
+    $playlist = new playlist;
+    $result = $playlist->get_playlist($p_id);
+    echo json_encode($result);
 }
 
 function save_playlist($param)
 {
-        error_log(__METHOD__. print_r($param,1));
+    debug(__METHOD__. print_r($param,1));
 
-    $result = playlist::save_playlist(
+    $playlist = new playlist;
+    $result = $playlist->save_playlist(
                 $param
                 );
     echo json_encode($result);

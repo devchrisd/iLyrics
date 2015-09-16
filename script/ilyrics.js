@@ -289,7 +289,7 @@ $(function()
 
         $('#div-pl').hide();
 
-        // get playlist from server, return in json
+        // get playlist from server in json, add them into player list
         $.getJSON(url, function (playitems)
         {
             if(playitems)
@@ -302,6 +302,7 @@ $(function()
 
                     path = val.file.substr(0, pos);
                     file = val.file.substr(pos+1);
+
                     // add to playlist
                     $('#playlist').append(
                         "<li><span class='play_song' s_id='" + val.s_id + "' path='" + path + "' title='click to play'>" + file +
@@ -315,6 +316,7 @@ $(function()
         });
 
         $('#playlist').attr('p_id', $(this).attr('p_id'));
+        $('#playlist_name').text(':' + $(this).attr('p_name'));
 
     });
 
@@ -334,6 +336,7 @@ $(function()
 
         if ($('#playlist').attr('p_id') !== '')
         {
+            save_pl();
         }
         else
         {
@@ -362,11 +365,13 @@ $(function()
         if (p_name == '')
         {
             alert('Empty name!');
-            return;
+            return false;
         }
 
         save_pl(p_name);
+
         $('#div-save-pl>.float_right_button').click();
+        $('#playlist_name').text(':' + p_name);
     });
 
 
@@ -379,36 +384,43 @@ $(function()
 
 });
 
-    function save_pl()
+function save_pl()
+{
+    s_id_arr = [];
+    index = 0;
+
+    p_id = $('#playlist').attr('p_id');
+
+    if (p_id == '' && p_name == '')
     {
-        s_id_arr = [];
-        p_id = '';
-        index = 0;
-
-        p_id = $('#playlist').attr('p_id');
-
-        // get all items in player
-        $('.play_song').each(function()
-        {
-            s_id_arr[index++] = $(this).attr('s_id');
-        });
-
-log('save playlist: ' + s_id_arr);
-
-        $.ajax({
-            url: controller_url,
-            type: "POST",
-            data: { action: 'save_playlist', p_id: p_id, p_name: p_name, s_id: s_id_arr}
-        })
-        .done( function(result)
-        {
-            log(result);
-
-        });
-
         return false;
-
     }
+
+    // get all items in player
+    $('.play_song').each(function()
+    {
+        s_id_arr[index++] = $(this).attr('s_id');
+    });
+
+    if (index == 0) return false;
+
+    $.ajax({
+        url: controller_url,
+        type: "POST",
+        data: { action: 'save_playlist', p_id: p_id, p_name: p_name, s_id: s_id_arr}
+    })
+    .done( function(result)
+    {
+        log('return p_id = '+ result);
+        if (result !== '')
+        {
+            // update p_id
+            $('#playlist').attr('p_id', result);
+        }
+    });
+
+    return false;
+}
 
 /**
  * Song and Lyric

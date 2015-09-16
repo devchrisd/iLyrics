@@ -32,6 +32,7 @@
         <div class='div-list'>
             <header>
                 <h3>Playlist
+                <span id='playlist_name'></span>
                 <span class='float_right_button'>
                 <img class='show_pl' src='images/file_load.png' title='load playlist' alt='load' />
                 <img class='save_pl' src='images/file_save.png' title='save playlist' alt='save' />

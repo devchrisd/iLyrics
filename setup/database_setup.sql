@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS `playlist` (
   `p_name` varchar(255) NOT NULL DEFAULT '',
   `user_id` int(5) NOT NULL DEFAULT '0',
   PRIMARY KEY (`p_id`)
+  UNIQUE KEY `p_name` (`p_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `playlist_item` (
