@@ -136,13 +136,15 @@ class mp3_lib extends base_lib
             $query .= ", cover_file='" . self::$media_dbi->escape_string($cover_file) . "'";
         }
 
-        if (self::$media_dbi->insert($query) == false)
-        {
-            error_log(__METHOD__ . ' failed: ' . $query);
+        try {
+             self::$media_dbi->insert($query);
+
+            return true;
+        } catch (Exception $e) {
+
+            debug(__METHOD__ . ' Caught Exception: ' . $e->getMessage() . ' Query: '. $query);
             return false;
         }
-
-        return true;
     }
 
     // get media list from database
@@ -240,6 +242,7 @@ class mp3_lib extends base_lib
                 $query = rtrim($query, ",");
             }
             $query .= ' WHERE s_id="' . $s_id .'"';
+
             $result = self::$media_dbi->update($query);
         }
 

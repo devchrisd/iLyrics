@@ -65,22 +65,22 @@ class playlist extends base_lib
     {
         $p_id   = false;
         $p_name = $param['p_name'];
-        $query  = 'REPLACE INTO ' . Configure::MEDIA_DB . ".playlist set p_name='" . self::$media_dbi->escape_string($p_name) . "'";
+        $query  = 'INSERT INTO ' . Configure::MEDIA_DB . ".playlist set p_name='" . self::$media_dbi->escape_string($p_name) . "'";
 
-        if (self::$media_dbi->insert($query))
-        {
+        try{
+
+            self::$media_dbi->insert($query);
             $p_id = self::$media_dbi->last_insert_id();
-        }
 
-        if ($p_id == false)
+            $this->add_playitems($p_id, $param['s_id']);
+
+            return $p_id;
+        }
+        catch (Exception $e)
         {
-            error_log(__METHOD__ . ' failed create new playlist: ' . $query);
+            debug(__METHOD__ . ' Caught Exception: ' . $e->getMessage());
             return false;
         }
-
-        $this->add_playitems($p_id, $param['s_id']);
-
-        return $p_id;
     }
 
     private function add_playitems($p_id, $s_ids)
@@ -92,7 +92,7 @@ class playlist extends base_lib
 
             if (self::$media_dbi->insert($query) == false)
             {
-                error_log(__METHOD__ . ' failed create new playlist_item: ' . $query);
+                debug(__METHOD__ . ' failed create new playlist_item: ' . $query);
                 return false;
             }
         }

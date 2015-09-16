@@ -371,7 +371,6 @@ $(function()
         save_pl(p_name);
 
         $('#div-save-pl>.float_right_button').click();
-        $('#playlist_name').text(':' + p_name);
     });
 
 
@@ -384,7 +383,7 @@ $(function()
 
 });
 
-function save_pl()
+function save_pl(p_name)
 {
     s_id_arr = [];
     index = 0;
@@ -411,13 +410,16 @@ function save_pl()
     })
     .done( function(result)
     {
-        log('return p_id = '+ result);
-        if (result !== '')
+        result = $.parseJSON(result);
+        log('result : '+ result);
+
+        if (result && isNaN(Number(result)) == false)
         {
-            // update p_id
             $('#playlist').attr('p_id', result);
+            $('#playlist_name').text(':' + p_name);
         }
     });
+
 
     return false;
 }
