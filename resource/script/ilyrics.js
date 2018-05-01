@@ -316,7 +316,7 @@ $(function()
         });
 
         $('#playlist').attr('p_id', $(this).attr('p_id'));
-        $('#playlist_name').text(':' + $(this).attr('p_name'));
+        $('#playlist_name').text($(this).attr('p_name'));
 
     });
 
@@ -329,10 +329,6 @@ $(function()
 
      // save playlist to server
     $(document).on('click', '.save_pl', function(){
-
-        s_id_arr = [];
-        p_id = p_name = '';
-        index = 0;
 
         if ($('#playlist').attr('p_id') !== '')
         {
@@ -393,6 +389,8 @@ function save_pl(p_name)
     if (p_id == '' && p_name == '')
     {
         return false;
+    }else {
+        p_name = $('#playlist_name').text();
     }
 
     // get all items in player
@@ -416,7 +414,7 @@ function save_pl(p_name)
         if (result && isNaN(Number(result)) == false)
         {
             $('#playlist').attr('p_id', result);
-            $('#playlist_name').text(':' + p_name);
+            $('#playlist_name').text(p_name);
         }
     });
 

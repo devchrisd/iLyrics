@@ -1,15 +1,15 @@
 FEATURE:
  - Get LRC lyrics from online resource and save as local file
  - show lyrics in KaraOK style
- - playlist: add and remove songs to playlist
+ - playlist: add and remove songs to a playlist
+ - save the playlist with a name
+ - loop play
  - use HTML5 audio element, no plugin required
  - can read and apply offset in .lrc file:
     format:
         [offset:300]    // delay 300ms
         or
         [offset:-300]   // shift ahead 300ms
- - loop playlist
-
 
 
 Testing Environment:
@@ -53,6 +53,6 @@ SETUP:
 
 TODO:
 
-- save playlist
+- delete a playlist by name
 
 
