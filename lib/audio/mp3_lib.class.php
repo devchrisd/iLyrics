@@ -170,11 +170,11 @@ class mp3_lib extends base_lib
         }
 
 // $test_arr = array(
-//     'resource/audio/01.七个母音.mp3',
-//     'resource/audio/富士山下.mp3',
-//     'resource/audio/01.天边.mp3',
-//     'resource/audio/02.轻轻地告诉你.mp3',
-//     'resource/audio/对不起谢谢.mp3',
+//     'music_resource/audio/01.七个母音.mp3',
+//     'music_resource/audio/富士山下.mp3',
+//     'music_resource/audio/01.天边.mp3',
+//     'music_resource/audio/02.轻轻地告诉你.mp3',
+//     'music_resource/audio/对不起谢谢.mp3',
 // );
 // foreach ($test_arr as $value)
 //         self::get_ID3($value);

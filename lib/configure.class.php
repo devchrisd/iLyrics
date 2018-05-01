@@ -5,7 +5,7 @@ class Configure
 {
     const SEARCH_URL    = 'http://geci.me/api/';
 
-    const RESOURCE_PATH = 'resource/';
+    const RESOURCE_PATH = 'music_resource/';
     const LYRICS_PATH   = self::RESOURCE_PATH . 'lyric/';
     const COVER_PATH    = self::RESOURCE_PATH . 'cover/';
     const AUDIO_PATH    = self::RESOURCE_PATH . 'audio/';

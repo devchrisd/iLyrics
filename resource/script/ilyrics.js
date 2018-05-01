@@ -550,7 +550,7 @@ function setCover(cover)
     else
     {
         // replace with default
-        $('#artist_avatar').attr('src', 'images/default.jpg');
+        $('#artist_avatar').attr('src', 'resource/images/default.jpg');
     }
 }
 
@@ -574,7 +574,7 @@ function getCover(s_id)
         else
         {
             // replace with default
-            $('#artist_avatar').attr('src', 'images/default.jpg');
+            $('#artist_avatar').attr('src', 'resource/images/default.jpg');
         }
     });
     return;

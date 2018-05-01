@@ -14,21 +14,22 @@ FEATURE:
 
 Testing Environment:
  MAMP
- - Mac OSX 10.9.3
+ - Mac OSX 10.9.3 and above
  - Apache 2.2.26
  - MySQL 5.6.16
- - PHP 5.4.24,
+ - PHP 5.4.24 and above
  - getID3 from https://github.com/JamesHeinrich/getID3
+    https://github.com/JamesHeinrich/getID3.git
  // *REMOVED* - PEAR/PECL with ID3 installed
 
 
 USAGE:
 
-- Put mp3 files in folder "resource/audio/"
+- Put mp3 files in folder "music_resource/audio/"
 
-- Album cover is saved in "resource/cover/"
+- Album cover is saved in "music_resource/cover/"
 
-- Lyrics will be saved in "resource/lyric/"
+- Lyrics will be saved in "music_resource/lyric/"
     - Lyrics file name has the format of ARTIST_SONG.lrc (with no space)
         If this file is not availble, it will try the name SONG.lrc.
         If this name SONG.lrc is available, and artist name is known, it will rename SONG.lrc to ARTIST_SONG.lrc.
@@ -38,15 +39,15 @@ USAGE:
 
 SETUP:
 
-- Apache or the webserver user/group must have permission to create/modify file in resource/ (lyric/, audio/, and cover/ ). Use command:
+- Apache or the webserver user/group must have permission to create/modify file in music_resource/ (lyric/, audio/, and cover/ ). Use command:
     sudo chown www:www [dir]
-- Build up database with sql script in config/database_setup.sql
+- Build up database with sql script in setup/database_setup.sql
 - create user 'developer' in mysql:
 	mysql> create user 'developer'@'localhost' identified by 'ppp';
 	mysql> grant all on media.* to 'developer'@'localhost';
 	mysql> flush privileges;
 
-- Run [sitename_iLyrics]/iLyrics_controller.php?action=lib_refresh to scan the resource audio / lyrics and cover folder to setup database
+- Run [sitename_iLyrics]/iLyrics_controller.php?action=lib_refresh to scan the music_resource audio / lyrics and cover folder to setup database
 
 
 
