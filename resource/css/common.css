@@ -1,0 +1,121 @@
+/* General styles */
+*   {margin:0; padding:0; }
+
+img {border:0; }
+
+body {
+    height:100%;
+    font: 12px Helvetica, Arial, sans-serif;
+    text-align: left;
+    background: #F5F4EF url('../images/bg.png');
+    }
+
+html {height:100%; }
+
+html>body div, html>body div * 
+{
+    position:static;  /* good browsers */
+}
+
+header
+{
+    border:1px solid #cccccc;
+    position:absolute;
+}
+
+
+/* Headings */
+h1 {
+    font:bold 25px Verdana;
+    margin:10 25px;
+    text-shadow: 2px 3px 5px #888;
+}
+h2 {font-size: 22px}
+h3 {font-size: 20px}
+
+h2, h3, h4, h5, h6 {
+    margin: 10px;
+    font-weight: 400;
+    line-height: 1.1;
+}
+
+a:link, a:visited {
+    color: #C74350;
+    padding: 0 1px;
+    text-decoration: underline;
+}
+a:hover, a:active {
+    background-color: #C74350;
+    color: #fff;
+    text-decoration: none;
+    text-shadow: 1px 1px 1px #333;
+}
+
+/* Lists */
+ul {
+    list-style: outside disc;
+    margin: 10px 0 15px 15px;
+}
+/*
+
+* li:last-child {margin-bottom: 2;}
+
+*/
+
+::selection {background: #F6CF74; color: #fff;}
+
+/* Tables */
+table {margin: 5px auto 15px auto; width: 98%;}
+ 
+    /* Thead */
+    thead th {padding: 5px 4px; text-align: left;}
+    thead td {}
+ 
+    /* Tbody */
+    tbody td {padding: 5px 4px;}
+    tbody th {}
+ 
+    /* Tfoot */
+    tfoot th {}
+    tfoot td {}
+
+hr {margin-top:10px; margin-bottom:6px; }
+
+/***** form controls *****/
+
+input.btn   {background:#FFCC80; color:black; border:1px solid #AAAAAA; font:bold 11px Verdana; height:20px; width:90px; margin-left:2px; }
+input.ovr   {background:#D6D3CE; color:black; border:1px solid #888888; font:bold 11px Verdana; height:20px; width:90px; margin-left:2px; }
+
+.in {font:12px Verdana; border:1px solid #AAAAAA; height:18px; width:140px; margin:2px; }
+.mid    {width:250px; }
+.long   {width:450px; }
+
+.left
+{
+    text-align: left;
+    width: 100%;
+}
+
+.center
+{
+    text-align: center;
+}
+
+.right
+{
+    text-align: right;
+    padding: 5px;
+}
+
+textarea.in {height:100px; width:300px; }
+
+/* warnings */
+div.message-error   {width:100%; padding:2px 0 2px 0; font-weight:bold; background:#FF8080; }
+div.message-warning {width:100%; padding:2px 0 2px 0; font-weight:bold; background:#FFFF80; }
+
+.warning    {color:red; }
+ 
+.valign {margin-bottom:-2px; }
+
+/* text/plain email style */
+pre {font:11px Courier; }
